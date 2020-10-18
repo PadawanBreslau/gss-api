@@ -3,13 +3,19 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.7.2'
 
-gem 'rails', '~> 6.0.3', '>= 6.0.3.4'
+gem 'bcrypt', '~> 3.1.7'
+gem 'bootsnap', '>= 1.4.2', require: false
+gem 'figaro'
+gem 'image_processing', '~> 1.2'
+gem 'jsonapi_parameters'
+gem 'jsonapi-serializer'
 gem 'pg', '0.20.0'
 gem 'puma', '~> 4.1'
-gem 'bcrypt', '~> 3.1.7'
-gem 'image_processing', '~> 1.2'
+gem 'pundit'
 gem 'rack-cors', '1.0.2'
-gem 'bootsnap', '>= 1.4.2', require: false
+gem 'rails', '~> 6.0.3', '>= 6.0.3.4'
+gem 'trestle'
+gem 'trestle-active_storage'
 
 group :development, :test do
   gem 'bullet'
@@ -33,4 +39,3 @@ group :development do
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
 end
-
