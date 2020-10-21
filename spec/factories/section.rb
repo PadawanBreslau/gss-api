@@ -1,6 +1,8 @@
 FactoryBot.define do
-  factory :lap do
-    sequence(:number)
-    main { true }
+  factory :section do
+    start { Faker::Address.city }
+    finish { Faker::Address.city }
+    sequence(:order)
+    variation { 0 }
   end
 end
