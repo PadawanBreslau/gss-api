@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_21_122902) do
+ActiveRecord::Schema.define(version: 2020_10_21_125240) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -48,6 +48,18 @@ ActiveRecord::Schema.define(version: 2020_10_21_122902) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "subsections", force: :cascade do |t|
+    t.text "description"
+    t.integer "track_color"
+    t.jsonb "information"
+    t.integer "section_order", null: false
+    t.bigint "section_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["section_id"], name: "index_subsections_on_section_id"
+  end
+
   add_foreign_key "gps_locations", "mezoregions"
   add_foreign_key "mezoregions", "macroregions"
+  add_foreign_key "subsections", "sections"
 end
