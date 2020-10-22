@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_21_125240) do
+ActiveRecord::Schema.define(version: 2020_10_22_095150) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,6 +22,18 @@ ActiveRecord::Schema.define(version: 2020_10_21_125240) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["mezoregion_id"], name: "index_gps_locations_on_mezoregion_id"
+  end
+
+  create_table "locations", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "attraction", default: false
+    t.bigint "subsection_id", null: false
+    t.bigint "gps_location_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["gps_location_id"], name: "index_locations_on_gps_location_id"
+    t.index ["subsection_id"], name: "index_locations_on_subsection_id"
   end
 
   create_table "macroregions", force: :cascade do |t|
@@ -59,7 +71,23 @@ ActiveRecord::Schema.define(version: 2020_10_21_125240) do
     t.index ["section_id"], name: "index_subsections_on_section_id"
   end
 
+  create_table "utilities", force: :cascade do |t|
+    t.string "name", null: false
+    t.jsonb "information"
+    t.bigint "gps_location_id", null: false
+    t.bigint "location_id", null: false
+    t.integer "utility_type"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["gps_location_id"], name: "index_utilities_on_gps_location_id"
+    t.index ["location_id"], name: "index_utilities_on_location_id"
+  end
+
   add_foreign_key "gps_locations", "mezoregions"
+  add_foreign_key "locations", "gps_locations"
+  add_foreign_key "locations", "subsections"
   add_foreign_key "mezoregions", "macroregions"
   add_foreign_key "subsections", "sections"
+  add_foreign_key "utilities", "gps_locations"
+  add_foreign_key "utilities", "locations"
 end
