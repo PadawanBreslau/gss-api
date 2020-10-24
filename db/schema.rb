@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_22_095150) do
+ActiveRecord::Schema.define(version: 2020_10_22_101519) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -69,6 +69,15 @@ ActiveRecord::Schema.define(version: 2020_10_22_095150) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["section_id"], name: "index_subsections_on_section_id"
+  end
+
+  create_table "trivia", force: :cascade do |t|
+    t.text "content"
+    t.string "triviable_type", null: false
+    t.bigint "triviable_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["triviable_type", "triviable_id"], name: "index_trivia_on_triviable_type_and_triviable_id"
   end
 
   create_table "utilities", force: :cascade do |t|
