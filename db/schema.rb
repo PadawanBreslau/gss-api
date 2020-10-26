@@ -117,7 +117,7 @@ ActiveRecord::Schema.define(version: 2020_10_24_200209) do
     t.string "name", null: false
     t.jsonb "information"
     t.bigint "gps_location_id", null: false
-    t.bigint "location_id", null: false
+    t.bigint "location_id"
     t.integer "utility_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

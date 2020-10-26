@@ -4,6 +4,7 @@ Rails.application.routes.draw do
       resources :sections, only: [:show, :index]
       resources :subsections, only: [:show]
       resources :locations, only: [:show]
+      resources :utilities, only: [:show]
     end
   end
 end

@@ -4,7 +4,7 @@ module Api
       def show
         location = Location.find(params[:id])
         options = {
-          include: [:gps_location, :trivia]
+          include: [:gps_location, :trivia, :images]
         }
         render json: LocationSerializer.new(location, options).serializable_hash
       end
