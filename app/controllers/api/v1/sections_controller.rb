@@ -5,7 +5,7 @@ module Api
         sections = Section.where(variation: 0).page(params[:page] || 0)
         options = {
           meta: index_meta_tags(sections),
-          include: [:subsections]
+          include: [:subsections, :trivia]
         }
 
         render json: SectionSerializer.new(sections, options).serializable_hash
@@ -14,7 +14,7 @@ module Api
       def show
         section = Section.find(params[:id])
         options = {
-          include: [:subsections]
+          include: [:subsections, :trivia]
         }
 
         render json: SectionSerializer.new(section, options).serializable_hash

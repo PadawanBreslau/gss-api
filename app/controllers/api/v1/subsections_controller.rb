@@ -4,7 +4,7 @@ module Api
       def show
         subsection = Subsection.find(params[:id])
         options = {
-          include: [:locations]
+          include: [:locations, :trivia]
         }
 
         render json: SubsectionSerializer.new(subsection, options).serializable_hash

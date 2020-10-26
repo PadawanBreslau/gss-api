@@ -10,5 +10,17 @@ describe 'Subections requests' do
       expect(body['start']).to eq 'Bardo'
       expect(body['finish']).to eq 'Kłodzka Góra'
     end
+
+    context 'with trivia' do
+      it 'returns a subsection' do
+        subsection = create(:subsection, start: 'Bardo', finish: 'Złoty Stok')
+        create(:trivium, triviable: subsection, content: 'Takie coś innego')
+        get "/api/v1/subsections/#{subsection.id}", headers: json_api_headers
+        expect(response).to have_http_status :ok
+        expect(json_included.size).to eq 1
+        expect(json_included.first['type']).to eq 'trivium'
+        expect(json_included.first['attributes']['content']).to eq 'Takie coś innego'
+      end
+    end
   end
 end

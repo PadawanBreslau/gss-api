@@ -31,8 +31,21 @@ describe 'Sections requests' do
         get "/api/v1/sections/#{section.id}", headers: json_api_headers
         expect(response).to have_http_status :ok
         expect(json_included.size).to eq 1
+        expect(json_included.first['type']).to eq 'subsection'
         expect(json_included.first['attributes']['start']).to eq 'Bardo'
         expect(json_included.first['attributes']['finish']).to eq 'Kłodzka Góra'
+      end
+    end
+
+    context 'with trivia' do
+      it 'returns a section' do
+        section = create(:section, start: 'Bardo', finish: 'Złoty Stok')
+        create(:trivium, triviable: section, content: 'Takie coś')
+        get "/api/v1/sections/#{section.id}", headers: json_api_headers
+        expect(response).to have_http_status :ok
+        expect(json_included.size).to eq 1
+        expect(json_included.first['type']).to eq 'trivium'
+        expect(json_included.first['attributes']['content']).to eq 'Takie coś'
       end
     end
   end
