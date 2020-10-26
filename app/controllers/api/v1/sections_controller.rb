@@ -1,8 +1,6 @@
 module Api
   module V1
     class SectionsController < Api::V1::BaseController
-      before_action :authenticate_api_v1_person!, only: []
-
       def index
         sections = Section.where(variation: 0).page(params[:page] || 0)
         options = {

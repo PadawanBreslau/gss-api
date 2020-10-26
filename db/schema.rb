@@ -57,6 +57,7 @@ ActiveRecord::Schema.define(version: 2020_10_24_200209) do
   create_table "locations", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
+    t.integer "subsection_order"
     t.boolean "attraction", default: false
     t.bigint "subsection_id", null: false
     t.bigint "gps_location_id", null: false
