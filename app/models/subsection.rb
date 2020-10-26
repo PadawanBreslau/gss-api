@@ -6,4 +6,26 @@ class Subsection < ApplicationRecord
   store :information, accessors: [:length, :ascent, :descent]
 
   validates :section_order, uniqueness: { scope: [:section_id] }
+  validate :proper_order_order, on: :create
+
+  def proper_order_order
+    unless proper_order_kept?
+      errors.add(:section_order, 'add subsections in proper order within section')
+    end
+  end
+
+  private
+
+  def proper_order_kept?
+    first_one_is_zero? || next_ones_are_following?
+  end
+
+  def first_one_is_zero?
+    section_order.zero? && section&.subsections.blank?
+  end
+
+  def next_ones_are_following?
+    section&.subsections.present? &&
+      section_order == section.subsections.map(&:section_order).max + 1
+  end
 end

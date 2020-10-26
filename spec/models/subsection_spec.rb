@@ -9,15 +9,15 @@ RSpec.describe Subsection do
   it 'allows one subsection order within section' do
     section = create(:section)
     expect do
-      create(:subsection, section: section, section_order: 5)
+      create(:subsection, section: section, section_order: 0)
     end.to change(described_class, :count).by(1)
 
     expect do
-      create(:subsection, section: section, section_order: 5)
+      create(:subsection, section: section, section_order: 0)
     end.to raise_error(ActiveRecord::RecordInvalid)
 
     expect do
-      create(:subsection, section: create(:section), section_order: 5)
+      create(:subsection, section: create(:section), section_order: 0)
     end.to change(described_class, :count).by(1)
   end
 end

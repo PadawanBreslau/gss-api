@@ -92,6 +92,8 @@ ActiveRecord::Schema.define(version: 2020_10_24_200209) do
 
   create_table "subsections", force: :cascade do |t|
     t.text "description"
+    t.string "start"
+    t.string "finish"
     t.integer "track_color"
     t.jsonb "information"
     t.integer "section_order", null: false

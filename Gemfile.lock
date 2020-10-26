@@ -281,6 +281,7 @@ DEPENDENCIES
   image_processing (~> 1.2)
   jsonapi-serializer
   jsonapi_parameters
+  kaminari
   letter_opener (= 1.4.1)
   listen
   pg (= 0.20.0)
