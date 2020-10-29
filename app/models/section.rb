@@ -10,4 +10,16 @@ class Section < ApplicationRecord
   def title
     "#{start} - #{finish}"
   end
+
+  def length
+    subsections&.sum{|subs| subs.length.to_i}
+  end
+
+  def ascent
+    subsections&.sum{|subs| subs.ascent.to_i}
+  end
+
+  def descent
+    subsections&.sum{|subs| subs.descent.to_i}
+  end
 end

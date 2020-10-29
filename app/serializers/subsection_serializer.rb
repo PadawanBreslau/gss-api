@@ -5,5 +5,5 @@ class SubsectionSerializer
   has_many :trivia
   has_many :images
 
-  attributes :track_color, :description, :start, :finish, :information, :section_order
+  attributes :track_color, :description, :start, :finish, :length, :ascent, :descent, :section_order
 end

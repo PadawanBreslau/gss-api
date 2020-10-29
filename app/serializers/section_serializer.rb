@@ -5,5 +5,5 @@ class SectionSerializer
   has_many :trivia
   has_many :images
 
-  attributes :start, :finish, :description, :order, :variation
+  attributes :start, :finish, :description, :order, :variation, :length, :ascent, :descent
 end
