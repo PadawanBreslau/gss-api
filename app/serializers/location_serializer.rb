@@ -5,5 +5,5 @@ class LocationSerializer
   has_many :trivia
   has_many :images
 
-  attributes :name, :description, :attraction, :subsection_order
+  attributes :name, :description, :attraction, :subsection_order, :subsection_id
 end

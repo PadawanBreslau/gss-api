@@ -3,12 +3,17 @@ class Subsection < ApplicationRecord
   has_many :trivia, as: :triviable
   has_many :images, as: :imagable
   has_many :locations
+  has_many :utilities
 
   enum track_color: [:without_track, :red, :blue, :green, :yellow, :black]
   store :information, accessors: [:length, :ascent, :descent]
 
   validates :section_order, uniqueness: { scope: [:section_id] }
   validate :proper_order_order, on: :create
+
+  def title
+    "#{start} - #{finish}"
+  end
 
   def proper_order_order
     unless proper_order_kept?

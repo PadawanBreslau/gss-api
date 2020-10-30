@@ -11,6 +11,8 @@ Trestle.resource(:subsection) do
     number_field :length, label: 'Lenght in km'
     number_field :ascent, label: 'Ascent in m'
     number_field :descent, label: 'Descent in m'
+    text_field :mt_uuid, label: 'Id of saved Mapa Turystyczna map'
+    check_box :horizontal_map, label: 'Is map rather horizontal?'
     select :track_color, Subsection.track_colors.keys.map { |color| [color.humanize, color] }
     select :section_id, Section.all.map { |section| [section.title, section.id] }, label: 'Section'
   end

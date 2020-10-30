@@ -1,6 +1,7 @@
 class Utility < ApplicationRecord
   belongs_to :gps_location
   belongs_to :location, optional: true
+  belongs_to :subsection, optional: true
 
   has_many :trivia, as: :triviable
   has_many :images, as: :imagable

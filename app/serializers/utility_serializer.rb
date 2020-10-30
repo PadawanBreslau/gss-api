@@ -5,5 +5,5 @@ class UtilitySerializer
   has_many :trivia
   has_many :images
 
-  attributes :information, :utility_type, :name
+  attributes :information, :utility_type, :name, :subsection_id
 end

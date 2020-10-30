@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_24_200209) do
+ActiveRecord::Schema.define(version: 2020_10_30_200942) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -101,6 +101,8 @@ ActiveRecord::Schema.define(version: 2020_10_24_200209) do
     t.bigint "section_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "horizontal_map"
+    t.string "mt_uuid"
     t.index ["section_id"], name: "index_subsections_on_section_id"
   end
 
@@ -121,6 +123,7 @@ ActiveRecord::Schema.define(version: 2020_10_24_200209) do
     t.integer "utility_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "subsection_id"
     t.index ["gps_location_id"], name: "index_utilities_on_gps_location_id"
     t.index ["location_id"], name: "index_utilities_on_location_id"
   end

@@ -1,5 +1,7 @@
 class Section < ApplicationRecord
   has_many :subsections
+  has_many :locations, through: :subsections
+  has_many :utilities, through: :subsections
   has_many :trivia, as: :triviable
   has_many :images, as: :imagable
   validates :start, :finish, :order, :variation, presence: true
@@ -12,14 +14,14 @@ class Section < ApplicationRecord
   end
 
   def length
-    subsections&.sum{|subs| subs.length.to_i}
+    subsections&.sum { |subs| subs.length.to_i }
   end
 
   def ascent
-    subsections&.sum{|subs| subs.ascent.to_i}
+    subsections&.sum { |subs| subs.ascent.to_i }
   end
 
   def descent
-    subsections&.sum{|subs| subs.descent.to_i}
+    subsections&.sum { |subs| subs.descent.to_i }
   end
 end
