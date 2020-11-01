@@ -7,5 +7,6 @@ class SubsectionSerializer
   has_many :images
 
   attributes :track_color, :description, :start, :finish,
-             :length, :ascent, :descent, :section_order, :mt_uuid, :horizontal_map
+             :length, :ascent, :descent, :section_order, :mt_uuid,
+             :horizontal_map, :previous_subsection, :next_subsection
 end

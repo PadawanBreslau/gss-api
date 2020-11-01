@@ -5,6 +5,10 @@ Trestle.resource(:utility) do
 
   form do
     text_field :name
+    text_field :address
+    text_field :phone_number
+    text_field :website
+
     select :utility_type, Utility.utility_types.keys
                                  .map { |u_type| [u_type.humanize, u_type] }
     select :subsection_id,

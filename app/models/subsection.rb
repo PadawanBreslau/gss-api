@@ -21,6 +21,14 @@ class Subsection < ApplicationRecord
     end
   end
 
+  def previous_subsection
+    section.subsections.find_by(section_order: section_order - 1)&.id
+  end
+
+  def next_subsection
+    section.subsections.find_by(section_order: section_order + 1)&.id
+  end
+
   private
 
   def proper_order_kept?

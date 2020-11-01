@@ -3,6 +3,15 @@ class ImageSerializer
 
   attributes :information
 
+  attribute :thumbnail do |record|
+    if record.picture.attached?
+      Rails.application.routes.url_helpers.rails_representation_url(
+        record.picture.variant(resize: '60x60').processed,
+        only_path: true
+      )
+    end
+  end
+
   attribute :picture_small do |record|
     if record.picture.attached?
       Rails.application.routes.url_helpers.rails_representation_url(
