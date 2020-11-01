@@ -11,6 +11,8 @@ class Subsection < ApplicationRecord
   validates :section_order, uniqueness: { scope: [:section_id] }
   validate :proper_order_order, on: :create
 
+  default_scope { order section_id: :asc, section_order: :asc }
+
   def title
     "#{start} - #{finish}"
   end

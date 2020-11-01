@@ -5,7 +5,7 @@ class Utility < ApplicationRecord
 
   has_many :trivia, as: :triviable
   has_many :images, as: :imagable
-  enum utility_type: [:accomodation, :food_and_accomodation, :restaurant,
+  enum utility_type: [:accommodation, :food_and_accommodation, :restaurant,
                       :petrol_station, :shop, :bus_stop, :train_station]
 
   store :information, accessors: [:address, :phone_number, :website]
