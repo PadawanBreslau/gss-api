@@ -3,4 +3,6 @@ class Image < ApplicationRecord
   has_one_attached :picture
 
   store :information, accessors: [:author, :licence, :description]
+
+  def delete_picture; end
 end

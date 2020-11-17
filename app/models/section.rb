@@ -14,7 +14,7 @@ class Section < ApplicationRecord
   end
 
   def length
-    subsections&.sum { |subs| subs.length.to_i }
+    subsections&.sum { |subs| subs.length.to_f }
   end
 
   def ascent

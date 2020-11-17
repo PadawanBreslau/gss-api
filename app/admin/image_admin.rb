@@ -5,6 +5,7 @@ Trestle.resource(:image) do
 
   form do |_image|
     active_storage_field :picture
+
     select :imagable_type, %w(Section Subsection Trivia Location Utility)
     text_field :imagable_id
   end

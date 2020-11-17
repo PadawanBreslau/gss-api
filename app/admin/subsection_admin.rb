@@ -8,7 +8,7 @@ Trestle.resource(:subsection) do
     text_field :finish
     text_area :description
     number_field :section_order
-    number_field :length, label: 'Lenght in km'
+    text_field :length, label: 'Lenght in km'
     number_field :ascent, label: 'Ascent in m'
     number_field :descent, label: 'Descent in m'
     text_field :mt_uuid, label: 'Id of saved Mapa Turystyczna map'
