@@ -1,7 +1,7 @@
 class ImageSerializer
   include JSONAPI::Serializer
 
-  attributes :information
+  attributes :author, :licence, :description
 
   attribute :thumbnail do |record|
     if record.picture.attached?

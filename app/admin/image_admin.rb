@@ -7,6 +7,9 @@ Trestle.resource(:image) do
     active_storage_field :picture
 
     select :imagable_type, %w(Section Subsection Trivia Location Utility)
-    text_field :imagable_id
+    text_field :imagable_id, label: 'Id of resource'
+    text_field :author
+    text_field :licence
+    text_field :description
   end
 end
