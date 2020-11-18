@@ -1,7 +1,7 @@
 class ImageSerializer
   include JSONAPI::Serializer
 
-  attributes :author, :licence, :description
+  attributes :author, :licence, :description, :url
 
   attribute :thumbnail do |record|
     if record.picture.attached?
@@ -33,7 +33,7 @@ class ImageSerializer
   attribute :picture_large do |record|
     if record.picture.attached?
       Rails.application.routes.url_helpers.rails_representation_url(
-        record.picture.variant(resize: '480x480').processed,
+        record.picture.variant(resize: '640x640').processed,
         only_path: true
       )
     end
