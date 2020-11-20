@@ -1,4 +1,10 @@
 Trestle.resource(:subsection) do
+  scope :main, default: true
+
+  Section.pluck(:id).each do |section_id|
+    scope "section_#{section_id}".to_sym
+  end
+
   menu do
     item :subsections, icon: 'fa fa-star'
   end

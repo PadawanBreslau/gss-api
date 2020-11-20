@@ -13,6 +13,12 @@ class Subsection < ApplicationRecord
 
   default_scope { order section_id: :asc, section_order: :asc }
 
+  Section.pluck(:id).each do |section_id|
+    scope "section_#{section_id}".to_sym, -> { where(section: section_id) }
+  end
+
+  scope :main, -> { joins(:section).where('sections.variation = 0') }
+
   def title
     "#{start} - #{finish}"
   end
@@ -42,7 +48,9 @@ class Subsection < ApplicationRecord
   end
 
   def next_ones_are_following?
-    section&.subsections.present? &&
+    return false unless section
+
+    section.reload.subsections.present? &&
       section_order == section.subsections.map(&:section_order).max + 1
   end
 end

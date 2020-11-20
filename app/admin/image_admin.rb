@@ -1,8 +1,8 @@
 Trestle.resource(:image) do
   scope :section
   scope :subsection, default: true
-  scope :utility, default: true
-  scope :location, default: true
+  scope :utility
+  scope :location
 
   menu do
     item :images, icon: 'fa fa-star'
