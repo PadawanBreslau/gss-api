@@ -234,6 +234,7 @@ GEM
       uber (< 0.2.0)
     retriable (3.1.2)
     rexml (3.2.4)
+    rollbar (3.1.1)
     rspec (3.9.0)
       rspec-core (~> 3.9.0)
       rspec-expectations (~> 3.9.0)
@@ -346,6 +347,7 @@ DEPENDENCIES
   pundit
   rack-cors (= 1.0.2)
   rails (~> 6.0.3, >= 6.0.3.4)
+  rollbar
   rspec-benchmark
   rspec-rails
   rubocop
