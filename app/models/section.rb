@@ -1,4 +1,5 @@
 class Section < ApplicationRecord
+  default_scope { order(order: :asc) }
   has_many :subsections
   has_many :locations, through: :subsections
   has_many :utilities, through: :subsections
