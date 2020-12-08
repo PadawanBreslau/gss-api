@@ -17,8 +17,10 @@ gem 'pundit'
 gem 'rack-cors', '1.0.2'
 gem 'rails', '~> 6.0.3', '>= 6.0.3.4'
 gem 'rollbar'
+gem 'sassc-rails'
 gem 'trestle'
 gem 'trestle-active_storage'
+gem 'trestle-auth'
 
 group :development, :test do
   gem 'bullet'
