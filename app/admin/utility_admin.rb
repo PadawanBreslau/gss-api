@@ -17,7 +17,7 @@ Trestle.resource(:utility) do
     select :location_id,
            Location.all.map { |location| [location.name, location.id] }, label: 'Location'
     select :gps_location_id,
-           GpsLocation.all.map { |gps_location| [gps_location.to_s, gps_location.id] },
+      GpsLocation.all.map { |gps_location| gps_location.internal_description || [gps_location.to_s, gps_location.id] },
            label: 'Gps Location'
   end
 end
