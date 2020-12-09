@@ -1,5 +1,5 @@
 class TriviumSerializer
   include JSONAPI::Serializer
 
-  attributes :content
+  attributes :content, :lon, :lat
 end

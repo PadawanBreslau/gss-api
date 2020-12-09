@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_09_091632) do
+ActiveRecord::Schema.define(version: 2020_12_09_094132) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -125,6 +125,8 @@ ActiveRecord::Schema.define(version: 2020_12_09_091632) do
     t.bigint "triviable_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "gps_location_id"
+    t.index ["gps_location_id"], name: "index_trivia_on_gps_location_id"
     t.index ["triviable_type", "triviable_id"], name: "index_trivia_on_triviable_type_and_triviable_id"
   end
 
