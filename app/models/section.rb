@@ -18,6 +18,11 @@ class Section < ApplicationRecord
     subsections&.sum { |subs| subs.length.to_f }
   end
 
+  def total_length
+    Section.where(variation: variation).where('sections.order <= ?', order)
+           .map(&:length).inject(:+).round(1)
+  end
+
   def ascent
     subsections&.sum { |subs| subs.ascent.to_i }
   end

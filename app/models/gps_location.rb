@@ -8,7 +8,7 @@ class GpsLocation < ApplicationRecord
   validates :lat, numericality: true, inclusion: -90..90
 
   Mezoregion.pluck(:id, :name).each do |id, name|
-    scope "#{normalize(name)}".to_sym, -> { where(mezoregion_id: id) }
+    scope normalize(name).to_sym, -> { where(mezoregion_id: id) }
   end
 
   def to_s
