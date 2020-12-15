@@ -1,5 +1,5 @@
 class Subsection < ApplicationRecord
-  belongs_to :section
+  belongs_to :section, autosave: true
   has_many :trivia, as: :triviable
   has_many :images, as: :imagable
   has_many :locations
@@ -19,6 +19,12 @@ class Subsection < ApplicationRecord
 
   scope :main, -> { joins(:section).where('sections.variation = 0') }
 
+  after_save :update_section
+
+  def update_section
+    section.recalculate_information
+  end
+
   def title
     "#{start} - #{finish}"
   end
@@ -27,14 +33,6 @@ class Subsection < ApplicationRecord
     unless proper_order_kept?
       errors.add(:section_order, 'add subsections in proper order within section')
     end
-  end
-
-  def previous_subsection
-    section.subsections.find_by(section_order: section_order - 1)&.id
-  end
-
-  def next_subsection
-    section.subsections.find_by(section_order: section_order + 1)&.id
   end
 
   private
