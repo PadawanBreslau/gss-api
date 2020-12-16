@@ -8,6 +8,10 @@ Trestle.resource(:image) do
     item :images, icon: 'fa fa-star'
   end
 
+  return_to do
+    image_admin_index_path
+  end
+
   active_storage_fields do
     [:picture]
   end

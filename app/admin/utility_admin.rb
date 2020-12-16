@@ -3,6 +3,10 @@ Trestle.resource(:utility) do
     item :utilities, icon: 'fa fa-star'
   end
 
+  return_to do
+    utility_admin_index_path
+  end
+
   form do
     text_field :name
     text_field :address
