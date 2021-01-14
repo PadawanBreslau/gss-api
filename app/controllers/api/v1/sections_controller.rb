@@ -2,11 +2,11 @@ module Api
   module V1
     class SectionsController < Api::V1::BaseController
       def index
-        sections = Section.where(variation: 0).includes([:subsections,
-                                                         :locations,
-                                                         :utilities,
-                                                         :images,
-                                                         :trivia])
+        sections = Section.includes([:subsections,
+                                     :locations,
+                                     :utilities,
+                                     :images,
+                                     :trivia])
         options = {
           include: [:subsections, :locations, :utilities]
         }

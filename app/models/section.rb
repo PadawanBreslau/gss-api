@@ -1,5 +1,5 @@
 class Section < ApplicationRecord
-  default_scope { order(order: :asc) }
+  default_scope { order(order: :asc, variation: :asc) }
   has_many :subsections
   has_many :locations, through: :subsections
   has_many :utilities, through: :subsections
@@ -8,7 +8,7 @@ class Section < ApplicationRecord
   validates :start, :finish, :order, :variation, presence: true
   validates :order, uniqueness: { scope: [:variation] }
 
-  enum variation: [:main, :first_alternative, :second_alternative]
+  enum variation: [:main, :secondary, :tertiary]
   store :information, accessors: [:length, :total_length, :ascent, :descent]
 
   def title

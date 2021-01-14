@@ -48,5 +48,25 @@ describe 'Sections requests' do
         expect(json_included.first['attributes']['content']).to eq 'Takie coś'
       end
     end
+
+    context 'with alternative routes' do
+      it 'returns an alternative route' do
+        section = create(:section, order: 0, start: 'Bardo', finish: 'Złoty Stok')
+        sectionalt = create(:section, order: 0, variation: 1, start: 'Bardo', finish: 'Złoty Stok')
+        section2 = create(:section, order: 1, start: 'Złoty Stok', finish: 'Lądek Zdrój')
+        get "/api/v1/sections/", headers: json_api_headers
+        expect(response).to have_http_status :ok
+        expect(json_response.size).to eq 3
+        first = json_response.first['attributes']
+        alternative = json_response.second['attributes']
+        last = json_response.last['attributes']
+
+        expect(first['id']).to eq section.id
+        expect(first['variation']).to eq 'main'
+        expect(alternative['id']).to eq sectionalt.id
+        expect(alternative['variation']).to eq 'secondary'
+        expect(last['id']).to eq section2.id
+      end
+    end
   end
 end
