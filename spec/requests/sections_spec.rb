@@ -54,7 +54,7 @@ describe 'Sections requests' do
         section = create(:section, order: 0, start: 'Bardo', finish: 'Złoty Stok')
         sectionalt = create(:section, order: 0, variation: 1, start: 'Bardo', finish: 'Złoty Stok')
         section2 = create(:section, order: 1, start: 'Złoty Stok', finish: 'Lądek Zdrój')
-        get "/api/v1/sections/", headers: json_api_headers
+        get '/api/v1/sections/', headers: json_api_headers
         expect(response).to have_http_status :ok
         expect(json_response.size).to eq 3
         first = json_response.first['attributes']

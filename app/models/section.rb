@@ -19,7 +19,7 @@ class Section < ApplicationRecord
     reload
     information =
       {
-        length: length_calculation,
+        length: length_calculation.round(1),
         total_length: (total_length_calculation.to_f + length_calculation.to_f).round(1),
         ascent: ascent_calculation,
         descent: descent_calculation
