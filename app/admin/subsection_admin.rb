@@ -1,5 +1,6 @@
 Trestle.resource(:subsection) do
   scope :main, default: true
+  scope :alternatives
 
   Section.pluck(:id).each do |section_id|
     scope "section_#{section_id}".to_sym

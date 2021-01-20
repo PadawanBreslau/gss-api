@@ -18,6 +18,7 @@ class Subsection < ApplicationRecord
   end
 
   scope :main, -> { joins(:section).where('sections.variation = 0') }
+  scope :alternatives, -> { joins(:section).where.not('sections.variation = 0') }
 
   after_save :update_section
 
