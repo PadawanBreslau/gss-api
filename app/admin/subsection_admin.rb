@@ -8,7 +8,8 @@ Trestle.resource(:subsection) do
 
   search do |query|
     if query
-      Subsection.where('subsections.start ILIKE ? OR subsections.finish ILIKE ?', "%#{query}%", "%#{query}%")
+      Subsection.where('subsections.start ILIKE ? OR subsections.finish ILIKE ?',
+                       "%#{query}%", "%#{query}%")
     else
       Subsection.all
     end
