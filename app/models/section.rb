@@ -10,6 +10,7 @@ class Section < ApplicationRecord
 
   enum variation: [:main, :secondary, :tertiary]
   store :information, accessors: [:length, :total_length, :ascent, :descent]
+  scope :alternatives, -> { secondary.or(tertiary) }
 
   def title
     "#{start} - #{finish}"

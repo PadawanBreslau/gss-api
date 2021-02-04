@@ -1,4 +1,15 @@
 Trestle.resource(:section) do
+  scope :main, default: true
+  scope :alternatives
+
+  search do |query|
+    if query
+      Section.where('start ILIKE ? OR finish ILIKE ?', "%#{query}%", "%#{query}%")
+    else
+      Section.all
+    end
+  end
+
   menu do
     item :sections, icon: 'fa fa-star'
   end
