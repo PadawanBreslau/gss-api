@@ -3,7 +3,7 @@ Trestle.resource(:trivium) do
     item :trivia, icon: 'fa fa-star'
   end
 
-  form do |_|
+  form dialog: true do
     text_field :content
     select :triviable_type, %w(Section Subsection Location Utility Mezoregion Macroregion)
     text_field :triviable_id

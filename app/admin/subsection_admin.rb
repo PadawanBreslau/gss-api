@@ -19,7 +19,7 @@ Trestle.resource(:subsection) do
     item :subsections, icon: 'fa fa-star'
   end
 
-  form do |_subsection|
+  form dialog: true do
     text_field :start
     text_field :finish
     text_area :description

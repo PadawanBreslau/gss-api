@@ -7,7 +7,7 @@ Trestle.resource(:utility) do
     utility_admin_index_path
   end
 
-  form do
+  form dialog: true do
     text_field :name
     text_field :address
     text_field :phone_number
