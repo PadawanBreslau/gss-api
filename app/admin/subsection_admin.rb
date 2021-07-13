@@ -20,16 +20,27 @@ Trestle.resource(:subsection) do
   end
 
   form dialog: true do
-    text_field :start
-    text_field :finish
-    text_area :description
-    number_field :section_order
-    text_field :length, label: 'Lenght in km'
-    number_field :ascent, label: 'Ascent in m'
-    number_field :descent, label: 'Descent in m'
-    text_field :mt_uuid, label: 'Id of saved Mapa Turystyczna map'
-    check_box :horizontal_map, label: 'Is map rather horizontal?'
-    # select :track_color, Subsection.track_colors.keys.map { |color| [color.humanize, color] }
+    row do
+      col {  text_field :start }
+      col { text_field :finish }
+    end
+
+    row do
+      col(sm:12) { text_area :description, rows: 12 }
+    end
+
     select :section_id, Section.all.map { |section| [section.title, section.id] }, label: 'Section'
+    number_field :section_order
+
+    row do
+      col(sm: 3) { text_field :length, label: 'Lenght in km' }
+      col(sm: 3) { number_field :ascent, label: 'Ascent in m' }
+      col(sm: 3) { number_field :descent, label: 'Descent in m' }
+    end
+
+    row do
+      col { text_field :mt_uuid, label: 'Id of saved Mapa Turystyczna map' }
+      col { check_box :horizontal_map, label: 'Is map rather horizontal?' }
+    end
   end
 end
