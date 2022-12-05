@@ -50,7 +50,7 @@ RSpec.describe Section do
       expect(section.total_length).to eq subsection.length + subsection2.length
     end
 
-    it 'creates  sections without more subsection data' do
+    it 'creates sections without more subsection data' do
       section = create(:section, order: 0)
       subsection = create(:subsection, :with_information, section: section, section_order: 0)
       subsection2 = create(:subsection, :with_information, section: section, section_order: 1)

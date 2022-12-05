@@ -2,10 +2,6 @@ Trestle.resource(:subsection) do
   scope :main, default: true
   scope :alternatives
 
-  Section.pluck(:id).each do |section_id|
-    scope "section_#{section_id}".to_sym
-  end
-
   search do |query|
     if query
       Subsection.where('subsections.start ILIKE ? OR subsections.finish ILIKE ?',
@@ -21,12 +17,12 @@ Trestle.resource(:subsection) do
 
   form dialog: true do
     row do
-      col {  text_field :start }
+      col { text_field :start }
       col { text_field :finish }
     end
 
     row do
-      col(sm:12) { text_area :description, rows: 12 }
+      col(sm: 12) { text_area :description, rows: 12 }
     end
 
     select :section_id, Section.all.map { |section| [section.title, section.id] }, label: 'Section'

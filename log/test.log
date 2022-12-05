@@ -1,0 +1,1040 @@
+  [1m[35m (3.9ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY)[0m
+  [1m[35m (3.0ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" character varying NOT NULL PRIMARY KEY, "value" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT pg_try_advisory_lock(1630053769944751515)[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to CreateMacroregions (20201021115314)
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (2.9ms)[0m  [1m[35mCREATE TABLE "macroregions" ("id" bigserial primary key, "name" character varying NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201021115314"]]
+  [1m[35m (0.4ms)[0m  [1m[35mCOMMIT[0m
+Migrating to CreateMezoregions (20201021115418)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (3.6ms)[0m  [1m[35mCREATE TABLE "mezoregions" ("id" bigserial primary key, "name" character varying NOT NULL, "macroregion_id" bigint NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_535b309c57"
+FOREIGN KEY ("macroregion_id")
+  REFERENCES "macroregions" ("id")
+)[0m
+  [1m[35m (1.0ms)[0m  [1m[35mCREATE  INDEX  "index_mezoregions_on_macroregion_id" ON "mezoregions"  ("macroregion_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201021115418"]]
+  [1m[35m (0.4ms)[0m  [1m[35mCOMMIT[0m
+Migrating to CreateGpsLocations (20201021115839)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (2.1ms)[0m  [1m[35mCREATE TABLE "gps_locations" ("id" bigserial primary key, "lat" float NOT NULL, "lon" float NOT NULL, "mezoregion_id" bigint NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_42158761f5"
+FOREIGN KEY ("mezoregion_id")
+  REFERENCES "mezoregions" ("id")
+)[0m
+  [1m[35m (0.8ms)[0m  [1m[35mCREATE  INDEX  "index_gps_locations_on_mezoregion_id" ON "gps_locations"  ("mezoregion_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201021115839"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+Migrating to CreateSections (20201021122902)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (1.9ms)[0m  [1m[35mCREATE TABLE "sections" ("id" bigserial primary key, "start" character varying NOT NULL, "finish" character varying NOT NULL, "description" text, "order" integer NOT NULL, "variation" integer NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201021122902"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+Migrating to CreateSubsections (20201021125240)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (2.2ms)[0m  [1m[35mCREATE TABLE "subsections" ("id" bigserial primary key, "description" text, "start" character varying, "finish" character varying, "track_color" integer, "information" jsonb, "section_order" integer NOT NULL, "section_id" bigint NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_dd9427d3db"
+FOREIGN KEY ("section_id")
+  REFERENCES "sections" ("id")
+)[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE  INDEX  "index_subsections_on_section_id" ON "subsections"  ("section_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201021125240"]]
+  [1m[35m (0.4ms)[0m  [1m[35mCOMMIT[0m
+Migrating to CreateLocations (20201022093153)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (2.6ms)[0m  [1m[35mCREATE TABLE "locations" ("id" bigserial primary key, "name" character varying NOT NULL, "description" text, "subsection_order" integer, "attraction" boolean DEFAULT FALSE, "subsection_id" bigint NOT NULL, "gps_location_id" bigint NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_6571cfdfe8"
+FOREIGN KEY ("subsection_id")
+  REFERENCES "subsections" ("id")
+, CONSTRAINT "fk_rails_548e60fd42"
+FOREIGN KEY ("gps_location_id")
+  REFERENCES "gps_locations" ("id")
+)[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE  INDEX  "index_locations_on_subsection_id" ON "locations"  ("subsection_id")[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE  INDEX  "index_locations_on_gps_location_id" ON "locations"  ("gps_location_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201022093153"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+Migrating to CreateUtilities (20201022095150)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (1.9ms)[0m  [1m[35mCREATE TABLE "utilities" ("id" bigserial primary key, "name" character varying NOT NULL, "information" jsonb, "gps_location_id" bigint NOT NULL, "location_id" bigint, "utility_type" integer, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_a56964f0ff"
+FOREIGN KEY ("gps_location_id")
+  REFERENCES "gps_locations" ("id")
+, CONSTRAINT "fk_rails_539f179d27"
+FOREIGN KEY ("location_id")
+  REFERENCES "locations" ("id")
+)[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE  INDEX  "index_utilities_on_gps_location_id" ON "utilities"  ("gps_location_id")[0m
+  [1m[35m (0.4ms)[0m  [1m[35mCREATE  INDEX  "index_utilities_on_location_id" ON "utilities"  ("location_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201022095150"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+Migrating to CreateTrivia (20201022101519)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (1.3ms)[0m  [1m[35mCREATE TABLE "trivia" ("id" bigserial primary key, "content" text, "triviable_type" character varying NOT NULL, "triviable_id" bigint NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE  INDEX  "index_trivia_on_triviable_type_and_triviable_id" ON "trivia"  ("triviable_type", "triviable_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201022101519"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+Migrating to CreateImages (20201024195909)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (1.5ms)[0m  [1m[35mCREATE TABLE "images" ("id" bigserial primary key, "imagable_type" character varying NOT NULL, "imagable_id" bigint NOT NULL, "information" jsonb, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE  INDEX  "index_images_on_imagable_type_and_imagable_id" ON "images"  ("imagable_type", "imagable_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201024195909"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+Migrating to CreateActiveStorageTables (20201024200209)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (1.5ms)[0m  [1m[35mCREATE TABLE "active_storage_blobs" ("id" bigserial primary key, "key" character varying NOT NULL, "filename" character varying NOT NULL, "content_type" character varying, "metadata" text, "byte_size" bigint NOT NULL, "checksum" character varying NOT NULL, "created_at" timestamp NOT NULL)[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_active_storage_blobs_on_key" ON "active_storage_blobs"  ("key")[0m
+  [1m[35m (1.4ms)[0m  [1m[35mCREATE TABLE "active_storage_attachments" ("id" bigserial primary key, "name" character varying NOT NULL, "record_type" character varying NOT NULL, "record_id" bigint NOT NULL, "blob_id" bigint NOT NULL, "created_at" timestamp NOT NULL, CONSTRAINT "fk_rails_c3b3935057"
+FOREIGN KEY ("blob_id")
+  REFERENCES "active_storage_blobs" ("id")
+)[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE  INDEX  "index_active_storage_attachments_on_blob_id" ON "active_storage_attachments"  ("blob_id")[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_active_storage_attachments_uniqueness" ON "active_storage_attachments"  ("record_type", "record_id", "name", "blob_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201024200209"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+Migrating to AddSubsectionIdToUtilities (20201029133900)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "utilities" ADD "subsection_id" integer[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201029133900"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+Migrating to AddHorizontalAndMtUuidToSubsections (20201030200942)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "subsections" ADD "horizontal_map" boolean[0m
+  [1m[35m (0.1ms)[0m  [1m[35mALTER TABLE "subsections" ADD "mt_uuid" character varying[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201030200942"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+Migrating to AddMtUuidToSections (20201208144218)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mALTER TABLE "sections" ADD "mt_uuid" character varying[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201208144218"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+Migrating to CreateAdministrators (20201208150257)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (1.7ms)[0m  [1m[35mCREATE TABLE "administrators" ("id" bigserial primary key, "email" character varying, "password_digest" character varying, "first_name" character varying, "last_name" character varying, "remember_token" character varying, "remember_token_expires_at" timestamp, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201208150257"]]
+  [1m[35m (0.3ms)[0m  [1m[35mCOMMIT[0m
+Migrating to AddInternalDescrptionToGpsLocations (20201209091632)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.8ms)[0m  [1m[35mALTER TABLE "gps_locations" ADD "internal_description" character varying[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201209091632"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+Migrating to AddGpsLocationToTrivia (20201209094132)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mALTER TABLE "trivia" ADD "gps_location_id" bigint[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE  INDEX  "index_trivia_on_gps_location_id" ON "trivia"  ("gps_location_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201209094132"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+Migrating to AddInformationToSections (20201215002425)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mALTER TABLE "sections" ADD "information" jsonb[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20201215002425"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.2ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "key"[0m  [["key", "environment"], ["value", "test"], ["created_at", "2022-12-05 12:02:24.606881"], ["updated_at", "2022-12-05 12:02:24.606881"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_advisory_unlock(1630053769944751515)[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "ar_internal_metadata"."value" FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1[0m  [["key", "schema_sha1"]]
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "ar_internal_metadata"."value" FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1[0m  [["key", "environment"]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "ar_internal_metadata"."value" FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1[0m  [["key", "environment"]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "ar_internal_metadata"."value" FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1[0m  [["key", "environment"]]
+  [1m[35m (12.4ms)[0m  [1m[35mDROP DATABASE IF EXISTS "gss-test"[0m
+  [1m[35m (105.0ms)[0m  [1m[35mCREATE DATABASE "gss-test" ENCODING = 'utf8' TEMPLATE = "template0"[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[35mCREATE EXTENSION IF NOT EXISTS "plpgsql"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "active_storage_attachments" CASCADE[0m
+  [1m[35m (3.9ms)[0m  [1m[35mCREATE TABLE "active_storage_attachments" ("id" bigserial primary key, "name" character varying NOT NULL, "record_type" character varying NOT NULL, "record_id" bigint NOT NULL, "blob_id" bigint NOT NULL, "created_at" timestamp NOT NULL)[0m
+  [1m[35m (0.8ms)[0m  [1m[35mCREATE  INDEX  "index_active_storage_attachments_on_blob_id" ON "active_storage_attachments"  ("blob_id")[0m
+  [1m[35m (0.9ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_active_storage_attachments_uniqueness" ON "active_storage_attachments"  ("record_type", "record_id", "name", "blob_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "active_storage_blobs" CASCADE[0m
+  [1m[35m (1.8ms)[0m  [1m[35mCREATE TABLE "active_storage_blobs" ("id" bigserial primary key, "key" character varying NOT NULL, "filename" character varying NOT NULL, "content_type" character varying, "metadata" text, "byte_size" bigint NOT NULL, "checksum" character varying NOT NULL, "created_at" timestamp NOT NULL)[0m
+  [1m[35m (0.8ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_active_storage_blobs_on_key" ON "active_storage_blobs"  ("key")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "administrators" CASCADE[0m
+  [1m[35m (1.9ms)[0m  [1m[35mCREATE TABLE "administrators" ("id" bigserial primary key, "email" character varying, "password_digest" character varying, "first_name" character varying, "last_name" character varying, "remember_token" character varying, "remember_token_expires_at" timestamp, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "gps_locations" CASCADE[0m
+  [1m[35m (1.8ms)[0m  [1m[35mCREATE TABLE "gps_locations" ("id" bigserial primary key, "lat" float NOT NULL, "lon" float NOT NULL, "mezoregion_id" bigint NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, "internal_description" character varying)[0m
+  [1m[35m (0.8ms)[0m  [1m[35mCREATE  INDEX  "index_gps_locations_on_mezoregion_id" ON "gps_locations"  ("mezoregion_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "images" CASCADE[0m
+  [1m[35m (1.8ms)[0m  [1m[35mCREATE TABLE "images" ("id" bigserial primary key, "imagable_type" character varying NOT NULL, "imagable_id" bigint NOT NULL, "information" jsonb, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE  INDEX  "index_images_on_imagable_type_and_imagable_id" ON "images"  ("imagable_type", "imagable_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "locations" CASCADE[0m
+  [1m[35m (1.6ms)[0m  [1m[35mCREATE TABLE "locations" ("id" bigserial primary key, "name" character varying NOT NULL, "description" text, "subsection_order" integer, "attraction" boolean DEFAULT FALSE, "subsection_id" bigint NOT NULL, "gps_location_id" bigint NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (0.9ms)[0m  [1m[35mCREATE  INDEX  "index_locations_on_gps_location_id" ON "locations"  ("gps_location_id")[0m
+  [1m[35m (0.8ms)[0m  [1m[35mCREATE  INDEX  "index_locations_on_subsection_id" ON "locations"  ("subsection_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "macroregions" CASCADE[0m
+  [1m[35m (1.5ms)[0m  [1m[35mCREATE TABLE "macroregions" ("id" bigserial primary key, "name" character varying NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "mezoregions" CASCADE[0m
+  [1m[35m (1.4ms)[0m  [1m[35mCREATE TABLE "mezoregions" ("id" bigserial primary key, "name" character varying NOT NULL, "macroregion_id" bigint NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE  INDEX  "index_mezoregions_on_macroregion_id" ON "mezoregions"  ("macroregion_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "sections" CASCADE[0m
+  [1m[35m (1.4ms)[0m  [1m[35mCREATE TABLE "sections" ("id" bigserial primary key, "start" character varying NOT NULL, "finish" character varying NOT NULL, "description" text, "order" integer NOT NULL, "variation" integer NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, "mt_uuid" character varying, "information" jsonb)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "subsections" CASCADE[0m
+  [1m[35m (1.5ms)[0m  [1m[35mCREATE TABLE "subsections" ("id" bigserial primary key, "description" text, "start" character varying, "finish" character varying, "track_color" integer, "information" jsonb, "section_order" integer NOT NULL, "section_id" bigint NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, "horizontal_map" boolean, "mt_uuid" character varying)[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE  INDEX  "index_subsections_on_section_id" ON "subsections"  ("section_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "trivia" CASCADE[0m
+  [1m[35m (1.5ms)[0m  [1m[35mCREATE TABLE "trivia" ("id" bigserial primary key, "content" text, "triviable_type" character varying NOT NULL, "triviable_id" bigint NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, "gps_location_id" bigint)[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE  INDEX  "index_trivia_on_gps_location_id" ON "trivia"  ("gps_location_id")[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE  INDEX  "index_trivia_on_triviable_type_and_triviable_id" ON "trivia"  ("triviable_type", "triviable_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "utilities" CASCADE[0m
+  [1m[35m (1.6ms)[0m  [1m[35mCREATE TABLE "utilities" ("id" bigserial primary key, "name" character varying NOT NULL, "information" jsonb, "gps_location_id" bigint NOT NULL, "location_id" bigint, "utility_type" integer, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, "subsection_id" integer)[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE  INDEX  "index_utilities_on_gps_location_id" ON "utilities"  ("gps_location_id")[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE  INDEX  "index_utilities_on_location_id" ON "utilities"  ("location_id")[0m
+  [1m[35m (0.8ms)[0m  [1m[35mALTER TABLE "active_storage_attachments" ADD CONSTRAINT "fk_rails_c3b3935057"
+FOREIGN KEY ("blob_id")
+  REFERENCES "active_storage_blobs" ("id")
+[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "gps_locations" ADD CONSTRAINT "fk_rails_42158761f5"
+FOREIGN KEY ("mezoregion_id")
+  REFERENCES "mezoregions" ("id")
+[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "locations" ADD CONSTRAINT "fk_rails_548e60fd42"
+FOREIGN KEY ("gps_location_id")
+  REFERENCES "gps_locations" ("id")
+[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "locations" ADD CONSTRAINT "fk_rails_6571cfdfe8"
+FOREIGN KEY ("subsection_id")
+  REFERENCES "subsections" ("id")
+[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "mezoregions" ADD CONSTRAINT "fk_rails_535b309c57"
+FOREIGN KEY ("macroregion_id")
+  REFERENCES "macroregions" ("id")
+[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "subsections" ADD CONSTRAINT "fk_rails_dd9427d3db"
+FOREIGN KEY ("section_id")
+  REFERENCES "sections" ("id")
+[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "utilities" ADD CONSTRAINT "fk_rails_a56964f0ff"
+FOREIGN KEY ("gps_location_id")
+  REFERENCES "gps_locations" ("id")
+[0m
+  [1m[35m (0.4ms)[0m  [1m[35mALTER TABLE "utilities" ADD CONSTRAINT "fk_rails_539f179d27"
+FOREIGN KEY ("location_id")
+  REFERENCES "locations" ("id")
+[0m
+  [1m[35m (1.7ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY)[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" (version) VALUES (20201215002425)[0m
+  [1m[35m (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" (version) VALUES
+(20201021115314),
+(20201021115418),
+(20201021115839),
+(20201021122902),
+(20201021125240),
+(20201022093153),
+(20201022095150),
+(20201022101519),
+(20201024195909),
+(20201024200209),
+(20201029133900),
+(20201030200942),
+(20201208144218),
+(20201208150257),
+(20201209091632),
+(20201209094132);
+
+[0m
+  [1m[35m (1.4ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" character varying NOT NULL PRIMARY KEY, "value" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.2ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "key"[0m  [["key", "environment"], ["value", "test"], ["created_at", "2022-12-05 12:02:31.424632"], ["updated_at", "2022-12-05 12:02:31.424632"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "schema_sha1"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.1ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "key"[0m  [["key", "schema_sha1"], ["value", "175fa5c5cbc1a7dbf3e79aced32a2311f7ebe772"], ["created_at", "2022-12-05 12:02:31.427064"], ["updated_at", "2022-12-05 12:02:31.427064"]]
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.4ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.3ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mSection Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 2], ["variation", 0], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "sections"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 5], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.4ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "South Imelda"], ["finish", "South Evia"], ["order", 5], ["variation", 0], ["created_at", "2022-12-05 12:02:32.222356"], ["updated_at", "2022-12-05 12:02:32.222356"]]
+  [1m[35m (0.2ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "sections"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 5], ["variation", 0], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "sections"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 5], ["variation", 1], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Jakubowskiport"], ["finish", "Tadbury"], ["order", 5], ["variation", 1], ["created_at", "2022-12-05 12:02:32.228375"], ["updated_at", "2022-12-05 12:02:32.228375"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "sections"[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Terryport"], ["finish", "Toyton"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:02:32.231262"], ["updated_at", "2022-12-05 12:02:32.231262"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 3]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 3], ["variation", 0], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "North Rob"], ["finish", "Carterburgh"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:02:32.246108"], ["updated_at", "2022-12-05 12:02:32.246108"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 4], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 4]]
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Trompshire"], ["finish", "Sidland"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:02:32.258332"], ["updated_at", "2022-12-05 12:02:32.258332"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 5], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 5]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 0], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Keeshaville"], ["finish", "Carolinehaven"], ["order", 0], ["variation", 0], ["created_at", "2022-12-05 12:02:32.264239"], ["updated_at", "2022-12-05 12:02:32.264239"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 6], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 6]]
+  [1m[35m (0.3ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_2[0m
+  [1m[35m (0.3ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.3ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSubsection Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" IS NULL LIMIT $2[0m  [["section_order", 0], ["LIMIT", 1]]
+  [1m[36mSubsection Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" IS NULL LIMIT $2[0m  [["section_order", 1], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "North Bertfort"], ["finish", "West Jessicafurt"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:02:32.276700"], ["updated_at", "2022-12-05 12:02:32.276700"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "subsections"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 7], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 7]]
+  [1m[36mSubsection Create (0.6ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "track_color", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["description", "Est laboriosam ut. Soluta et ut. Veniam harum quasi."], ["track_color", 0], ["section_order", 0], ["section_id", 7], ["created_at", "2022-12-05 12:02:32.279869"], ["updated_at", "2022-12-05 12:02:32.279869"]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 7], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 7]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 7], ["variation", 0], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Florentinomouth"], ["finish", "Dickiport"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:02:32.286636"], ["updated_at", "2022-12-05 12:02:32.286636"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 8], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 8]]
+  [1m[36mSubsection Create (0.2ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "track_color", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["description", "Ipsum ullam iste. Explicabo distinctio totam. Voluptates sequi ea."], ["track_color", 4], ["section_order", 0], ["section_id", 8], ["created_at", "2022-12-05 12:02:32.288693"], ["updated_at", "2022-12-05 12:02:32.288693"]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 8], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 8]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 8], ["variation", 0], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Bardo"], ["finish", "Złoty Stok"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:02:32.294356"], ["updated_at", "2022-12-05 12:02:32.294356"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/sections/9" for 127.0.0.1 at 2022-12-05 13:02:32 +0100
+Processing by Api::V1::SectionsController#show as JSON
+  Parameters: {"id"=>"9", "section"=>{}}
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 ORDER BY "sections"."order" ASC, "sections"."variation" ASC LIMIT $2[0m  [["id", 9], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "subsections"."id" FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 9]]
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "locations"."id" FROM "locations" INNER JOIN "subsections" ON "locations"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 9]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "utilities"."id" FROM "utilities" INNER JOIN "subsections" ON "utilities"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 9]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "trivia"."id" FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 9], ["triviable_type", "Section"]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "images"."id" FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 9], ["imagable_type", "Section"]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 9]]
+  [1m[36mLocation Load (0.1ms)[0m  [1m[34mSELECT "locations".* FROM "locations" INNER JOIN "subsections" ON "locations"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 9]]
+  [1m[36mUtility Load (0.1ms)[0m  [1m[34mSELECT "utilities".* FROM "utilities" INNER JOIN "subsections" ON "utilities"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 9]]
+  [1m[36mImage Load (0.1ms)[0m  [1m[34mSELECT "images".* FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 9], ["imagable_type", "Section"]]
+  [1m[36mTrivium Load (0.1ms)[0m  [1m[34mSELECT "trivia".* FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 9], ["triviable_type", "Section"]]
+Completed 200 OK in 19ms (Views: 0.2ms | ActiveRecord: 7.3ms | Allocations: 11146)
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Bardo"], ["finish", "Złoty Stok"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:02:32.326945"], ["updated_at", "2022-12-05 12:02:32.326945"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 2], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Złoty Stok"], ["finish", "Przełęcz Lądecka"], ["order", 2], ["variation", 0], ["created_at", "2022-12-05 12:02:32.328386"], ["updated_at", "2022-12-05 12:02:32.328386"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/sections" for 127.0.0.1 at 2022-12-05 13:02:32 +0100
+Processing by Api::V1::SectionsController#index as JSON
+  Parameters: {"section"=>{}}
+  [1m[36mSection Load (0.3ms)[0m  [1m[34mSELECT "sections".* FROM "sections" ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" IN ($1, $2) ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 10], ["section_id", 11]]
+  [1m[36mImage Load (0.2ms)[0m  [1m[34mSELECT "images".* FROM "images" WHERE "images"."imagable_type" = $1 AND "images"."imagable_id" IN ($2, $3)[0m  [["imagable_type", "Section"], ["imagable_id", 10], ["imagable_id", 11]]
+  [1m[36mTrivium Load (0.2ms)[0m  [1m[34mSELECT "trivia".* FROM "trivia" WHERE "trivia"."triviable_type" = $1 AND "trivia"."triviable_id" IN ($2, $3)[0m  [["triviable_type", "Section"], ["triviable_id", 10], ["triviable_id", 11]]
+Completed 200 OK in 4ms (Views: 0.3ms | ActiveRecord: 0.9ms | Allocations: 4073)
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.3ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Bardo"], ["finish", "Złoty Stok"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:02:32.340214"], ["updated_at", "2022-12-05 12:02:32.340214"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 12], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 12]]
+  [1m[36mSubsection Create (0.3ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "start", "finish", "track_color", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING "id"[0m  [["description", "Amet occaecati repellat. Ut sit ea. Fugiat mollitia aspernatur."], ["start", "Bardo"], ["finish", "Kłodzka Góra"], ["track_color", 2], ["section_order", 0], ["section_id", 12], ["created_at", "2022-12-05 12:02:32.343276"], ["updated_at", "2022-12-05 12:02:32.343276"]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 12], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 12]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 12], ["variation", 0], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_2[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Bardo"], ["finish", "Złoty Stok"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:02:32.348752"], ["updated_at", "2022-12-05 12:02:32.348752"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mTrivium Create (0.3ms)[0m  [1m[32mINSERT INTO "trivia" ("content", "triviable_type", "triviable_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["content", "Takie coś"], ["triviable_type", "Section"], ["triviable_id", 13], ["created_at", "2022-12-05 12:02:32.352862"], ["updated_at", "2022-12-05 12:02:32.352862"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/sections/13" for 127.0.0.1 at 2022-12-05 13:02:32 +0100
+Processing by Api::V1::SectionsController#show as JSON
+  Parameters: {"id"=>"13", "section"=>{}}
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 ORDER BY "sections"."order" ASC, "sections"."variation" ASC LIMIT $2[0m  [["id", 13], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "subsections"."id" FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 13]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "locations"."id" FROM "locations" INNER JOIN "subsections" ON "locations"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 13]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "utilities"."id" FROM "utilities" INNER JOIN "subsections" ON "utilities"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 13]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "trivia"."id" FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 13], ["triviable_type", "Section"]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "images"."id" FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 13], ["imagable_type", "Section"]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 13]]
+  [1m[36mLocation Load (0.2ms)[0m  [1m[34mSELECT "locations".* FROM "locations" INNER JOIN "subsections" ON "locations"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 13]]
+  [1m[36mUtility Load (0.4ms)[0m  [1m[34mSELECT "utilities".* FROM "utilities" INNER JOIN "subsections" ON "utilities"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 13]]
+  [1m[36mImage Load (0.2ms)[0m  [1m[34mSELECT "images".* FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 13], ["imagable_type", "Section"]]
+  [1m[36mTrivium Load (0.2ms)[0m  [1m[34mSELECT "trivia".* FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 13], ["triviable_type", "Section"]]
+Completed 200 OK in 21ms (Views: 0.2ms | ActiveRecord: 2.0ms | Allocations: 4951)
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 0], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Bardo"], ["finish", "Złoty Stok"], ["order", 0], ["variation", 0], ["created_at", "2022-12-05 12:02:32.381556"], ["updated_at", "2022-12-05 12:02:32.381556"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 0], ["variation", 1], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Bardo"], ["finish", "Złoty Stok"], ["order", 0], ["variation", 1], ["created_at", "2022-12-05 12:02:32.383259"], ["updated_at", "2022-12-05 12:02:32.383259"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Złoty Stok"], ["finish", "Lądek Zdrój"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:02:32.384677"], ["updated_at", "2022-12-05 12:02:32.384677"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/sections/" for 127.0.0.1 at 2022-12-05 13:02:32 +0100
+Processing by Api::V1::SectionsController#index as JSON
+  Parameters: {"section"=>{}}
+  [1m[36mSection Load (0.3ms)[0m  [1m[34mSELECT "sections".* FROM "sections" ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" IN ($1, $2, $3) ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 14], ["section_id", 15], ["section_id", 16]]
+  [1m[36mImage Load (0.2ms)[0m  [1m[34mSELECT "images".* FROM "images" WHERE "images"."imagable_type" = $1 AND "images"."imagable_id" IN ($2, $3, $4)[0m  [["imagable_type", "Section"], ["imagable_id", 14], ["imagable_id", 15], ["imagable_id", 16]]
+  [1m[36mTrivium Load (0.2ms)[0m  [1m[34mSELECT "trivia".* FROM "trivia" WHERE "trivia"."triviable_type" = $1 AND "trivia"."triviable_id" IN ($2, $3, $4)[0m  [["triviable_type", "Section"], ["triviable_id", 14], ["triviable_id", 15], ["triviable_id", 16]]
+Completed 200 OK in 5ms (Views: 0.3ms | ActiveRecord: 1.0ms | Allocations: 4942)
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.3ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "New Hyon"], ["finish", "Port Amyfort"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:02:32.397798"], ["updated_at", "2022-12-05 12:02:32.397798"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 17], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 17]]
+  [1m[36mSubsection Create (0.2ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "start", "finish", "track_color", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING "id"[0m  [["description", "Ipsa corrupti nesciunt. Ex expedita architecto. Alias sed nisi."], ["start", "Bardo"], ["finish", "Kłodzka Góra"], ["track_color", 2], ["section_order", 0], ["section_id", 17], ["created_at", "2022-12-05 12:02:32.400137"], ["updated_at", "2022-12-05 12:02:32.400137"]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 17], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 17]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 17], ["variation", 0], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Christiansenton"], ["finish", "Hauckfurt"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:02:32.405777"], ["updated_at", "2022-12-05 12:02:32.405777"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 18], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 18]]
+  [1m[36mSubsection Create (0.2ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "start", "finish", "track_color", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING "id"[0m  [["description", "Consequatur facere et. Nam officia id. Est dolorum dolor."], ["start", "Bardo"], ["finish", "Złoty Stok"], ["track_color", 0], ["section_order", 0], ["section_id", 18], ["created_at", "2022-12-05 12:02:32.407950"], ["updated_at", "2022-12-05 12:02:32.407950"]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 18], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 18]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 18], ["variation", 0], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Brendonmouth"], ["finish", "Alethiamouth"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:02:32.413554"], ["updated_at", "2022-12-05 12:02:32.413554"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 19], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 19]]
+  [1m[36mSubsection Create (0.2ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "start", "finish", "track_color", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING "id"[0m  [["description", "Veniam accusamus consequuntur. Et beatae et. Dignissimos suscipit at."], ["start", "Bardo"], ["finish", "Złoty Stok"], ["track_color", 0], ["section_order", 0], ["section_id", 19], ["created_at", "2022-12-05 12:02:32.415637"], ["updated_at", "2022-12-05 12:02:32.415637"]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 19], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 19]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 19], ["variation", 0], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_2[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.3ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mMacroregion Create (0.3ms)[0m  [1m[32mINSERT INTO "macroregions" ("name", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["name", "voluptas"], ["created_at", "2022-12-05 12:02:32.424259"], ["updated_at", "2022-12-05 12:02:32.424259"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mMezoregion Create (0.3ms)[0m  [1m[32mINSERT INTO "mezoregions" ("name", "macroregion_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["name", "sed"], ["macroregion_id", 1], ["created_at", "2022-12-05 12:02:32.425974"], ["updated_at", "2022-12-05 12:02:32.425974"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mGpsLocation Create (0.5ms)[0m  [1m[32mINSERT INTO "gps_locations" ("lat", "lon", "mezoregion_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["lat", 0.0], ["lon", 0.0], ["mezoregion_id", 1], ["created_at", "2022-12-05 12:02:32.427121"], ["updated_at", "2022-12-05 12:02:32.427121"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mUtility Create (0.3ms)[0m  [1m[32mINSERT INTO "utilities" ("name", "gps_location_id", "utility_type", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["name", "esse"], ["gps_location_id", 1], ["utility_type", 0], ["created_at", "2022-12-05 12:02:32.429248"], ["updated_at", "2022-12-05 12:02:32.429248"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/utilities/1" for 127.0.0.1 at 2022-12-05 13:02:32 +0100
+Processing by Api::V1::UtilitiesController#show as JSON
+  Parameters: {"id"=>"1", "utility"=>{}}
+  [1m[36mUtility Load (0.1ms)[0m  [1m[34mSELECT "utilities".* FROM "utilities" WHERE "utilities"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[36mImage Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2 LIMIT $3[0m  [["imagable_id", 1], ["imagable_type", "Utility"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "trivia"."id" FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 1], ["triviable_type", "Utility"]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "images"."id" FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 1], ["imagable_type", "Utility"]]
+  [1m[36mGpsLocation Load (0.1ms)[0m  [1m[34mSELECT "gps_locations".* FROM "gps_locations" WHERE "gps_locations"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+Completed 200 OK in 5ms (Views: 0.2ms | ActiveRecord: 0.7ms | Allocations: 3657)
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "ar_internal_metadata"."value" FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1[0m  [["key", "schema_sha1"]]
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.4ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.3ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.3ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mSection Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 2], ["variation", 0], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "sections"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 5], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.3ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "West Doreathashire"], ["finish", "East Lamarborough"], ["order", 5], ["variation", 0], ["created_at", "2022-12-05 12:03:49.292212"], ["updated_at", "2022-12-05 12:03:49.292212"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "sections"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 5], ["variation", 0], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "sections"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 5], ["variation", 1], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "East Jamelhaven"], ["finish", "Elmerberg"], ["order", 5], ["variation", 1], ["created_at", "2022-12-05 12:03:49.297595"], ["updated_at", "2022-12-05 12:03:49.297595"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "sections"[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Wallyview"], ["finish", "Alejandrastad"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.300363"], ["updated_at", "2022-12-05 12:03:49.300363"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 22], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 22]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 22], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.3ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 0\\ntotal_length: 0.0\\nascent: 0\\ndescent: 0\\n\""], ["updated_at", "2022-12-05 12:03:49.306768"], ["id", 22]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "North Shirlee"], ["finish", "Sauerview"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.310740"], ["updated_at", "2022-12-05 12:03:49.310740"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 23], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 23]]
+  [1m[36mSubsection Create (0.4ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "track_color", "information", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING "id"[0m  [["description", "Quaerat dolor sequi. Ullam iste qui. Dolores neque ut."], ["track_color", 4], ["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 9.8\\nascent: 123\\ndescent: 432\\n\""], ["section_order", 0], ["section_id", 23], ["created_at", "2022-12-05 12:03:49.319276"], ["updated_at", "2022-12-05 12:03:49.319276"]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 23], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 23]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 23], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.2ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 9.8\\ntotal_length: 9.8\\nascent: 123\\ndescent: 432\\n\""], ["updated_at", "2022-12-05 12:03:49.322751"], ["id", 23]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 23], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "South Mitsue"], ["finish", "West Merlinfort"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.326360"], ["updated_at", "2022-12-05 12:03:49.326360"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 24], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 24]]
+  [1m[36mSubsection Create (0.2ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "track_color", "information", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING "id"[0m  [["description", "Neque magni sint. Sit eveniet atque. Nulla velit voluptates."], ["track_color", 0], ["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 9.8\\nascent: 123\\ndescent: 432\\n\""], ["section_order", 0], ["section_id", 24], ["created_at", "2022-12-05 12:03:49.328878"], ["updated_at", "2022-12-05 12:03:49.328878"]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 24], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 24]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 24], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.1ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 9.8\\ntotal_length: 9.8\\nascent: 123\\ndescent: 432\\n\""], ["updated_at", "2022-12-05 12:03:49.331986"], ["id", 24]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 1], ["section_id", 24], ["LIMIT", 1]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 24], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 24]]
+  [1m[36mSubsection Create (0.3ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "track_color", "information", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING "id"[0m  [["description", "Quia hic et. Ratione veniam earum. Nihil doloribus nulla."], ["track_color", 4], ["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 9.8\\nascent: 123\\ndescent: 432\\n\""], ["section_order", 1], ["section_id", 24], ["created_at", "2022-12-05 12:03:49.334986"], ["updated_at", "2022-12-05 12:03:49.334986"]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 24], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 24]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 24], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.3ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 19.6\\ntotal_length: 19.6\\nascent: 246\\ndescent: 864\\n\""], ["updated_at", "2022-12-05 12:03:49.338756"], ["id", 24]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 0], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "North Margretport"], ["finish", "Bergstrommouth"], ["order", 0], ["variation", 0], ["created_at", "2022-12-05 12:03:49.342465"], ["updated_at", "2022-12-05 12:03:49.342465"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 25], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 25]]
+  [1m[36mSubsection Create (0.3ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "track_color", "information", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING "id"[0m  [["description", "Molestiae natus eius. Alias quisquam suscipit. Iure neque ut."], ["track_color", 0], ["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 9.8\\nascent: 123\\ndescent: 432\\n\""], ["section_order", 0], ["section_id", 25], ["created_at", "2022-12-05 12:03:49.345407"], ["updated_at", "2022-12-05 12:03:49.345407"]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 25], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 25]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 0) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 0], ["id", 25], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.3ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 9.8\\ntotal_length: 9.8\\nascent: 123\\ndescent: 432\\n\""], ["updated_at", "2022-12-05 12:03:49.349111"], ["id", 25]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 1], ["section_id", 25], ["LIMIT", 1]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 25], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 25]]
+  [1m[36mSubsection Create (0.2ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "track_color", "information", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING "id"[0m  [["description", "Ipsa quo voluptatem. Suscipit maxime accusantium. Voluptatum nulla repellendus."], ["track_color", 1], ["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 9.8\\nascent: 123\\ndescent: 432\\n\""], ["section_order", 1], ["section_id", 25], ["created_at", "2022-12-05 12:03:49.352776"], ["updated_at", "2022-12-05 12:03:49.352776"]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 25], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 25]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 0) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 0], ["id", 25], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.1ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 19.6\\ntotal_length: 19.6\\nascent: 246\\ndescent: 864\\n\""], ["updated_at", "2022-12-05 12:03:49.356033"], ["id", 25]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Lindgrenburgh"], ["finish", "Edgarberg"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.358311"], ["updated_at", "2022-12-05 12:03:49.358311"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 26], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 26]]
+  [1m[36mSubsection Create (0.2ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "track_color", "information", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING "id"[0m  [["description", "Quia ab cum. Recusandae accusantium animi. Facere ea error."], ["track_color", 1], ["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 9.8\\nascent: 123\\ndescent: 432\\n\""], ["section_order", 0], ["section_id", 26], ["created_at", "2022-12-05 12:03:49.360792"], ["updated_at", "2022-12-05 12:03:49.360792"]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 26], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 26]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 26], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.2ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 9.8\\ntotal_length: 29.4\\nascent: 123\\ndescent: 432\\n\""], ["updated_at", "2022-12-05 12:03:49.364092"], ["id", 26]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" IS NULL LIMIT $2[0m  [["section_order", 0], ["LIMIT", 1]]
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" IS NULL LIMIT $2[0m  [["section_order", 1], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Lake Mahalia"], ["finish", "Port Ronberg"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.372408"], ["updated_at", "2022-12-05 12:03:49.372408"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "subsections"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 27], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 27]]
+  [1m[36mSubsection Create (0.2ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "track_color", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["description", "Esse accusamus consequatur. Consequatur saepe error. Neque sit id."], ["track_color", 3], ["section_order", 0], ["section_id", 27], ["created_at", "2022-12-05 12:03:49.375704"], ["updated_at", "2022-12-05 12:03:49.375704"]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 27], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 27]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 27], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.2ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 0.0\\ntotal_length: 0.0\\nascent: 0\\ndescent: 0\\n\""], ["updated_at", "2022-12-05 12:03:49.378886"], ["id", 27]]
+  [1m[35m (0.2ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "subsections"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 27], ["LIMIT", 1]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 27], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 27]]
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "subsections"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 2], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Simonishaven"], ["finish", "South Deann"], ["order", 2], ["variation", 0], ["created_at", "2022-12-05 12:03:49.384878"], ["updated_at", "2022-12-05 12:03:49.384878"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 28], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 28]]
+  [1m[36mSubsection Create (0.3ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "track_color", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["description", "Voluptas non tenetur. Earum velit consequuntur. Ut mollitia voluptatem."], ["track_color", 5], ["section_order", 0], ["section_id", 28], ["created_at", "2022-12-05 12:03:49.387271"], ["updated_at", "2022-12-05 12:03:49.387271"]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 28], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 28]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 2) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 2], ["id", 28], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.2ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 0.0\\ntotal_length: 0.0\\nascent: 0\\ndescent: 0\\n\""], ["updated_at", "2022-12-05 12:03:49.390252"], ["id", 28]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "subsections"[0m
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "North Conniemouth"], ["finish", "East Maris"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.394523"], ["updated_at", "2022-12-05 12:03:49.394523"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 29], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 29]]
+  [1m[36mSubsection Create (0.2ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "track_color", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["description", "Esse dolor a. Exercitationem iure nam. Aut excepturi ducimus."], ["track_color", 2], ["section_order", 0], ["section_id", 29], ["created_at", "2022-12-05 12:03:49.396838"], ["updated_at", "2022-12-05 12:03:49.396838"]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 29], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 29]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 29], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.2ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 0.0\\ntotal_length: 0.0\\nascent: 0\\ndescent: 0\\n\""], ["updated_at", "2022-12-05 12:03:49.399781"], ["id", 29]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mMacroregion Create (0.3ms)[0m  [1m[32mINSERT INTO "macroregions" ("name", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["name", "quasi"], ["created_at", "2022-12-05 12:03:49.418962"], ["updated_at", "2022-12-05 12:03:49.418962"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mMezoregion Create (0.3ms)[0m  [1m[32mINSERT INTO "mezoregions" ("name", "macroregion_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["name", "cumque"], ["macroregion_id", 2], ["created_at", "2022-12-05 12:03:49.420360"], ["updated_at", "2022-12-05 12:03:49.420360"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mGpsLocation Create (0.2ms)[0m  [1m[32mINSERT INTO "gps_locations" ("lat", "lon", "mezoregion_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["lat", 0.0], ["lon", 0.0], ["mezoregion_id", 2], ["created_at", "2022-12-05 12:03:49.421634"], ["updated_at", "2022-12-05 12:03:49.421634"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mLocation Create (0.4ms)[0m  [1m[32mINSERT INTO "locations" ("name", "description", "subsection_order", "subsection_id", "gps_location_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING "id"[0m  [["name", "quis"], ["description", "Incidunt eaque ut. Tenetur voluptate rem. Voluptas sit delectus."], ["subsection_order", 0], ["subsection_id", 15], ["gps_location_id", 2], ["created_at", "2022-12-05 12:03:49.423018"], ["updated_at", "2022-12-05 12:03:49.423018"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/locations/1" for 127.0.0.1 at 2022-12-05 13:03:49 +0100
+Processing by Api::V1::LocationsController#show as JSON
+  Parameters: {"id"=>"1", "location"=>{}}
+  [1m[36mLocation Load (0.2ms)[0m  [1m[34mSELECT "locations".* FROM "locations" WHERE "locations"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "trivia"."id" FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 1], ["triviable_type", "Location"]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "images"."id" FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 1], ["imagable_type", "Location"]]
+  [1m[36mGpsLocation Load (0.1ms)[0m  [1m[34mSELECT "gps_locations".* FROM "gps_locations" WHERE "gps_locations"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  [1m[36mTrivium Load (0.1ms)[0m  [1m[34mSELECT "trivia".* FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 1], ["triviable_type", "Location"]]
+  [1m[36mImage Load (0.1ms)[0m  [1m[34mSELECT "images".* FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 1], ["imagable_type", "Location"]]
+Completed 200 OK in 11ms (Views: 0.3ms | ActiveRecord: 3.9ms | Allocations: 6935)
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Bardo"], ["finish", "Złoty Stok"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.448584"], ["updated_at", "2022-12-05 12:03:49.448584"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/sections/30" for 127.0.0.1 at 2022-12-05 13:03:49 +0100
+Processing by Api::V1::SectionsController#show as JSON
+  Parameters: {"id"=>"30", "section"=>{}}
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 ORDER BY "sections"."order" ASC, "sections"."variation" ASC LIMIT $2[0m  [["id", 30], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "subsections"."id" FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 30]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "locations"."id" FROM "locations" INNER JOIN "subsections" ON "locations"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 30]]
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "utilities"."id" FROM "utilities" INNER JOIN "subsections" ON "utilities"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 30]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "trivia"."id" FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 30], ["triviable_type", "Section"]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "images"."id" FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 30], ["imagable_type", "Section"]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 30]]
+  [1m[36mLocation Load (0.2ms)[0m  [1m[34mSELECT "locations".* FROM "locations" INNER JOIN "subsections" ON "locations"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 30]]
+  [1m[36mUtility Load (0.2ms)[0m  [1m[34mSELECT "utilities".* FROM "utilities" INNER JOIN "subsections" ON "utilities"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 30]]
+  [1m[36mImage Load (0.2ms)[0m  [1m[34mSELECT "images".* FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 30], ["imagable_type", "Section"]]
+  [1m[36mTrivium Load (0.2ms)[0m  [1m[34mSELECT "trivia".* FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 30], ["triviable_type", "Section"]]
+Completed 200 OK in 12ms (Views: 0.2ms | ActiveRecord: 3.7ms | Allocations: 7913)
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Bardo"], ["finish", "Złoty Stok"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.468388"], ["updated_at", "2022-12-05 12:03:49.468388"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 2], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Złoty Stok"], ["finish", "Przełęcz Lądecka"], ["order", 2], ["variation", 0], ["created_at", "2022-12-05 12:03:49.469781"], ["updated_at", "2022-12-05 12:03:49.469781"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/sections" for 127.0.0.1 at 2022-12-05 13:03:49 +0100
+Processing by Api::V1::SectionsController#index as JSON
+  Parameters: {"section"=>{}}
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m
+  [1m[36mSubsection Load (0.3ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" IN ($1, $2) ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 31], ["section_id", 32]]
+  [1m[36mImage Load (0.4ms)[0m  [1m[34mSELECT "images".* FROM "images" WHERE "images"."imagable_type" = $1 AND "images"."imagable_id" IN ($2, $3)[0m  [["imagable_type", "Section"], ["imagable_id", 31], ["imagable_id", 32]]
+  [1m[36mTrivium Load (0.2ms)[0m  [1m[34mSELECT "trivia".* FROM "trivia" WHERE "trivia"."triviable_type" = $1 AND "trivia"."triviable_id" IN ($2, $3)[0m  [["triviable_type", "Section"], ["triviable_id", 31], ["triviable_id", 32]]
+Completed 200 OK in 6ms (Views: 0.2ms | ActiveRecord: 1.1ms | Allocations: 4071)
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Bardo"], ["finish", "Złoty Stok"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.482330"], ["updated_at", "2022-12-05 12:03:49.482330"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 33], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 33]]
+  [1m[36mSubsection Create (0.2ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "start", "finish", "track_color", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING "id"[0m  [["description", "Ratione impedit sunt. Sit totam maiores. Ducimus excepturi debitis."], ["start", "Bardo"], ["finish", "Kłodzka Góra"], ["track_color", 3], ["section_order", 0], ["section_id", 33], ["created_at", "2022-12-05 12:03:49.484632"], ["updated_at", "2022-12-05 12:03:49.484632"]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 33], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 33]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 33], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.2ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 0.0\\ntotal_length: 0.0\\nascent: 0\\ndescent: 0\\n\""], ["updated_at", "2022-12-05 12:03:49.487314"], ["id", 33]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/sections/33" for 127.0.0.1 at 2022-12-05 13:03:49 +0100
+Processing by Api::V1::SectionsController#show as JSON
+  Parameters: {"id"=>"33", "section"=>{}}
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 ORDER BY "sections"."order" ASC, "sections"."variation" ASC LIMIT $2[0m  [["id", 33], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "subsections"."id" FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 33]]
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "locations"."id" FROM "locations" INNER JOIN "subsections" ON "locations"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 33]]
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "utilities"."id" FROM "utilities" INNER JOIN "subsections" ON "utilities"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 33]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "trivia"."id" FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 33], ["triviable_type", "Section"]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "images"."id" FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 33], ["imagable_type", "Section"]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 33]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "locations"."id" FROM "locations" WHERE "locations"."subsection_id" = $1[0m  [["subsection_id", 16]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "utilities"."id" FROM "utilities" WHERE "utilities"."subsection_id" = $1[0m  [["subsection_id", 16]]
+  [1m[36mLocation Load (0.2ms)[0m  [1m[34mSELECT "locations".* FROM "locations" INNER JOIN "subsections" ON "locations"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 33]]
+  [1m[36mUtility Load (0.2ms)[0m  [1m[34mSELECT "utilities".* FROM "utilities" INNER JOIN "subsections" ON "utilities"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 33]]
+  [1m[36mImage Load (0.1ms)[0m  [1m[34mSELECT "images".* FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 33], ["imagable_type", "Section"]]
+  [1m[36mTrivium Load (0.2ms)[0m  [1m[34mSELECT "trivia".* FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 33], ["triviable_type", "Section"]]
+Completed 200 OK in 9ms (Views: 0.3ms | ActiveRecord: 2.5ms | Allocations: 5525)
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Bardo"], ["finish", "Złoty Stok"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.502681"], ["updated_at", "2022-12-05 12:03:49.502681"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mTrivium Create (0.3ms)[0m  [1m[32mINSERT INTO "trivia" ("content", "triviable_type", "triviable_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["content", "Takie coś"], ["triviable_type", "Section"], ["triviable_id", 34], ["created_at", "2022-12-05 12:03:49.506957"], ["updated_at", "2022-12-05 12:03:49.506957"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/sections/34" for 127.0.0.1 at 2022-12-05 13:03:49 +0100
+Processing by Api::V1::SectionsController#show as JSON
+  Parameters: {"id"=>"34", "section"=>{}}
+  [1m[36mSection Load (0.3ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 ORDER BY "sections"."order" ASC, "sections"."variation" ASC LIMIT $2[0m  [["id", 34], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "subsections"."id" FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 34]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "locations"."id" FROM "locations" INNER JOIN "subsections" ON "locations"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 34]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "utilities"."id" FROM "utilities" INNER JOIN "subsections" ON "utilities"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 34]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "trivia"."id" FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 34], ["triviable_type", "Section"]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "images"."id" FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 34], ["imagable_type", "Section"]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 34]]
+  [1m[36mLocation Load (0.2ms)[0m  [1m[34mSELECT "locations".* FROM "locations" INNER JOIN "subsections" ON "locations"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 34]]
+  [1m[36mUtility Load (0.2ms)[0m  [1m[34mSELECT "utilities".* FROM "utilities" INNER JOIN "subsections" ON "utilities"."subsection_id" = "subsections"."id" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 34]]
+  [1m[36mImage Load (0.1ms)[0m  [1m[34mSELECT "images".* FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 34], ["imagable_type", "Section"]]
+  [1m[36mTrivium Load (0.1ms)[0m  [1m[34mSELECT "trivia".* FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 34], ["triviable_type", "Section"]]
+Completed 200 OK in 7ms (Views: 0.2ms | ActiveRecord: 1.7ms | Allocations: 4941)
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 0], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Bardo"], ["finish", "Złoty Stok"], ["order", 0], ["variation", 0], ["created_at", "2022-12-05 12:03:49.520763"], ["updated_at", "2022-12-05 12:03:49.520763"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 0], ["variation", 1], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Bardo"], ["finish", "Złoty Stok"], ["order", 0], ["variation", 1], ["created_at", "2022-12-05 12:03:49.522148"], ["updated_at", "2022-12-05 12:03:49.522148"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.1ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Złoty Stok"], ["finish", "Lądek Zdrój"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.523225"], ["updated_at", "2022-12-05 12:03:49.523225"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/sections/" for 127.0.0.1 at 2022-12-05 13:03:49 +0100
+Processing by Api::V1::SectionsController#index as JSON
+  Parameters: {"section"=>{}}
+  [1m[36mSection Load (0.3ms)[0m  [1m[34mSELECT "sections".* FROM "sections" ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" IN ($1, $2, $3) ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 35], ["section_id", 36], ["section_id", 37]]
+  [1m[36mImage Load (0.1ms)[0m  [1m[34mSELECT "images".* FROM "images" WHERE "images"."imagable_type" = $1 AND "images"."imagable_id" IN ($2, $3, $4)[0m  [["imagable_type", "Section"], ["imagable_id", 35], ["imagable_id", 36], ["imagable_id", 37]]
+  [1m[36mTrivium Load (0.1ms)[0m  [1m[34mSELECT "trivia".* FROM "trivia" WHERE "trivia"."triviable_type" = $1 AND "trivia"."triviable_id" IN ($2, $3, $4)[0m  [["triviable_type", "Section"], ["triviable_id", 35], ["triviable_id", 36], ["triviable_id", 37]]
+Completed 200 OK in 4ms (Views: 0.3ms | ActiveRecord: 0.8ms | Allocations: 4942)
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Kelsihaven"], ["finish", "Uptonport"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.534881"], ["updated_at", "2022-12-05 12:03:49.534881"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 38], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 38]]
+  [1m[36mSubsection Create (0.2ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "start", "finish", "track_color", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING "id"[0m  [["description", "Et consequatur at. In non est. Laborum adipisci voluptates."], ["start", "Bardo"], ["finish", "Kłodzka Góra"], ["track_color", 0], ["section_order", 0], ["section_id", 38], ["created_at", "2022-12-05 12:03:49.537031"], ["updated_at", "2022-12-05 12:03:49.537031"]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 38], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 38]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 38], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.3ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 0.0\\ntotal_length: 0.0\\nascent: 0\\ndescent: 0\\n\""], ["updated_at", "2022-12-05 12:03:49.539932"], ["id", 38]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/subsections/17" for 127.0.0.1 at 2022-12-05 13:03:49 +0100
+Processing by Api::V1::SubsectionsController#show as JSON
+  Parameters: {"id"=>"17", "subsection"=>{}}
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC LIMIT $2[0m  [["id", 17], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "locations"."id" FROM "locations" WHERE "locations"."subsection_id" = $1[0m  [["subsection_id", 17]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "utilities"."id" FROM "utilities" WHERE "utilities"."subsection_id" = $1[0m  [["subsection_id", 17]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "trivia"."id" FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 17], ["triviable_type", "Subsection"]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "images"."id" FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 17], ["imagable_type", "Subsection"]]
+  [1m[36mLocation Load (0.1ms)[0m  [1m[34mSELECT "locations".* FROM "locations" WHERE "locations"."subsection_id" = $1[0m  [["subsection_id", 17]]
+  [1m[36mUtility Load (0.1ms)[0m  [1m[34mSELECT "utilities".* FROM "utilities" WHERE "utilities"."subsection_id" = $1[0m  [["subsection_id", 17]]
+  [1m[36mTrivium Load (0.2ms)[0m  [1m[34mSELECT "trivia".* FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 17], ["triviable_type", "Subsection"]]
+  [1m[36mImage Load (0.2ms)[0m  [1m[34mSELECT "images".* FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 17], ["imagable_type", "Subsection"]]
+Completed 200 OK in 6ms (Views: 0.2ms | ActiveRecord: 1.6ms | Allocations: 3370)
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.2ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "Lake Sanfordbury"], ["finish", "Irvinghaven"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.554059"], ["updated_at", "2022-12-05 12:03:49.554059"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 39], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 39]]
+  [1m[36mSubsection Create (0.2ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "start", "finish", "track_color", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING "id"[0m  [["description", "Consequatur aut quaerat. Magni modi voluptate. Nostrum illo animi."], ["start", "Bardo"], ["finish", "Złoty Stok"], ["track_color", 0], ["section_order", 0], ["section_id", 39], ["created_at", "2022-12-05 12:03:49.556407"], ["updated_at", "2022-12-05 12:03:49.556407"]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 39], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 39]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 39], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.2ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 0.0\\ntotal_length: 0.0\\nascent: 0\\ndescent: 0\\n\""], ["updated_at", "2022-12-05 12:03:49.559528"], ["id", 39]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mTrivium Create (0.2ms)[0m  [1m[32mINSERT INTO "trivia" ("content", "triviable_type", "triviable_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["content", "Takie coś innego"], ["triviable_type", "Subsection"], ["triviable_id", 18], ["created_at", "2022-12-05 12:03:49.560927"], ["updated_at", "2022-12-05 12:03:49.560927"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/subsections/18" for 127.0.0.1 at 2022-12-05 13:03:49 +0100
+Processing by Api::V1::SubsectionsController#show as JSON
+  Parameters: {"id"=>"18", "subsection"=>{}}
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC LIMIT $2[0m  [["id", 18], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "locations"."id" FROM "locations" WHERE "locations"."subsection_id" = $1[0m  [["subsection_id", 18]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "utilities"."id" FROM "utilities" WHERE "utilities"."subsection_id" = $1[0m  [["subsection_id", 18]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "trivia"."id" FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 18], ["triviable_type", "Subsection"]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "images"."id" FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 18], ["imagable_type", "Subsection"]]
+  [1m[36mLocation Load (0.1ms)[0m  [1m[34mSELECT "locations".* FROM "locations" WHERE "locations"."subsection_id" = $1[0m  [["subsection_id", 18]]
+  [1m[36mUtility Load (0.1ms)[0m  [1m[34mSELECT "utilities".* FROM "utilities" WHERE "utilities"."subsection_id" = $1[0m  [["subsection_id", 18]]
+  [1m[36mTrivium Load (0.1ms)[0m  [1m[34mSELECT "trivia".* FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 18], ["triviable_type", "Subsection"]]
+  [1m[36mImage Load (0.1ms)[0m  [1m[34mSELECT "images".* FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 18], ["imagable_type", "Subsection"]]
+Completed 200 OK in 5ms (Views: 0.2ms | ActiveRecord: 1.2ms | Allocations: 3303)
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."variation" = $2 LIMIT $3[0m  [["order", 1], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Create (0.3ms)[0m  [1m[32mINSERT INTO "sections" ("start", "finish", "order", "variation", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["start", "West Maganburgh"], ["finish", "West Arline"], ["order", 1], ["variation", 0], ["created_at", "2022-12-05 12:03:49.574554"], ["updated_at", "2022-12-05 12:03:49.574554"]]
+  [1m[35m (0.2ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mSubsection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "subsections" WHERE "subsections"."section_order" = $1 AND "subsections"."section_id" = $2 LIMIT $3[0m  [["section_order", 0], ["section_id", 40], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 40]]
+  [1m[36mSubsection Create (0.2ms)[0m  [1m[32mINSERT INTO "subsections" ("description", "start", "finish", "track_color", "section_order", "section_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING "id"[0m  [["description", "Et ea et. Dolorem placeat ullam. Omnis harum voluptas."], ["start", "Bardo"], ["finish", "Złoty Stok"], ["track_color", 0], ["section_order", 0], ["section_id", 40], ["created_at", "2022-12-05 12:03:49.577304"], ["updated_at", "2022-12-05 12:03:49.577304"]]
+  [1m[36mSection Load (0.1ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."id" = $1 LIMIT $2[0m  [["id", 40], ["LIMIT", 1]]
+  [1m[36mSubsection Load (0.1ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."section_id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC[0m  [["section_id", 40]]
+  [1m[36mSection Load (0.2ms)[0m  [1m[34mSELECT "sections".* FROM "sections" WHERE "sections"."variation" = $1 AND (sections.order < 1) ORDER BY "sections"."order" ASC, "sections"."variation" ASC[0m  [["variation", 0]]
+  [1m[36mSection Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "sections" WHERE "sections"."order" = $1 AND "sections"."id" != $2 AND "sections"."variation" = $3 LIMIT $4[0m  [["order", 1], ["id", 40], ["variation", 0], ["LIMIT", 1]]
+  [1m[36mSection Update (0.2ms)[0m  [1m[33mUPDATE "sections" SET "information" = $1, "updated_at" = $2 WHERE "sections"."id" = $3[0m  [["information", "\"--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\\nlength: 0.0\\ntotal_length: 0.0\\nascent: 0\\ndescent: 0\\n\""], ["updated_at", "2022-12-05 12:03:49.580289"], ["id", 40]]
+  [1m[35m (0.2ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mMacroregion Create (0.1ms)[0m  [1m[32mINSERT INTO "macroregions" ("name", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["name", "porro"], ["created_at", "2022-12-05 12:03:49.581912"], ["updated_at", "2022-12-05 12:03:49.581912"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mMezoregion Create (0.3ms)[0m  [1m[32mINSERT INTO "mezoregions" ("name", "macroregion_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["name", "placeat"], ["macroregion_id", 3], ["created_at", "2022-12-05 12:03:49.582752"], ["updated_at", "2022-12-05 12:03:49.582752"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mGpsLocation Create (0.2ms)[0m  [1m[32mINSERT INTO "gps_locations" ("lat", "lon", "mezoregion_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["lat", 0.0], ["lon", 0.0], ["mezoregion_id", 3], ["created_at", "2022-12-05 12:03:49.583839"], ["updated_at", "2022-12-05 12:03:49.583839"]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mTrivium Create (0.2ms)[0m  [1m[32mINSERT INTO "trivia" ("content", "triviable_type", "triviable_id", "created_at", "updated_at", "gps_location_id") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["content", "Dolorem odit eos ducimus."], ["triviable_type", "Subsection"], ["triviable_id", 19], ["created_at", "2022-12-05 12:03:49.584902"], ["updated_at", "2022-12-05 12:03:49.584902"], ["gps_location_id", 3]]
+  [1m[35m (0.1ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/subsections/19" for 127.0.0.1 at 2022-12-05 13:03:49 +0100
+Processing by Api::V1::SubsectionsController#show as JSON
+  Parameters: {"id"=>"19", "subsection"=>{}}
+  [1m[36mSubsection Load (0.2ms)[0m  [1m[34mSELECT "subsections".* FROM "subsections" WHERE "subsections"."id" = $1 ORDER BY "subsections"."section_id" ASC, "subsections"."section_order" ASC LIMIT $2[0m  [["id", 19], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "locations"."id" FROM "locations" WHERE "locations"."subsection_id" = $1[0m  [["subsection_id", 19]]
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "utilities"."id" FROM "utilities" WHERE "utilities"."subsection_id" = $1[0m  [["subsection_id", 19]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "trivia"."id" FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 19], ["triviable_type", "Subsection"]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "images"."id" FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 19], ["imagable_type", "Subsection"]]
+  [1m[36mLocation Load (0.1ms)[0m  [1m[34mSELECT "locations".* FROM "locations" WHERE "locations"."subsection_id" = $1[0m  [["subsection_id", 19]]
+  [1m[36mUtility Load (0.1ms)[0m  [1m[34mSELECT "utilities".* FROM "utilities" WHERE "utilities"."subsection_id" = $1[0m  [["subsection_id", 19]]
+  [1m[36mTrivium Load (0.1ms)[0m  [1m[34mSELECT "trivia".* FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 19], ["triviable_type", "Subsection"]]
+  [1m[36mGpsLocation Load (0.1ms)[0m  [1m[34mSELECT "gps_locations".* FROM "gps_locations" WHERE "gps_locations"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  [1m[36mImage Load (0.1ms)[0m  [1m[34mSELECT "images".* FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 19], ["imagable_type", "Subsection"]]
+Completed 200 OK in 6ms (Views: 0.2ms | ActiveRecord: 1.5ms | Allocations: 3820)
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  [1m[35m (0.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mMacroregion Create (0.2ms)[0m  [1m[32mINSERT INTO "macroregions" ("name", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"[0m  [["name", "qui"], ["created_at", "2022-12-05 12:03:49.601482"], ["updated_at", "2022-12-05 12:03:49.601482"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.0ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mMezoregion Create (0.1ms)[0m  [1m[32mINSERT INTO "mezoregions" ("name", "macroregion_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["name", "recusandae"], ["macroregion_id", 4], ["created_at", "2022-12-05 12:03:49.602745"], ["updated_at", "2022-12-05 12:03:49.602745"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mGpsLocation Create (0.1ms)[0m  [1m[32mINSERT INTO "gps_locations" ("lat", "lon", "mezoregion_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["lat", 0.0], ["lon", 0.0], ["mezoregion_id", 4], ["created_at", "2022-12-05 12:03:49.603564"], ["updated_at", "2022-12-05 12:03:49.603564"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+  [1m[35m (0.1ms)[0m  [1m[35mSAVEPOINT active_record_2[0m
+  [1m[36mUtility Create (0.2ms)[0m  [1m[32mINSERT INTO "utilities" ("name", "gps_location_id", "utility_type", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["name", "delectus"], ["gps_location_id", 4], ["utility_type", 0], ["created_at", "2022-12-05 12:03:49.604491"], ["updated_at", "2022-12-05 12:03:49.604491"]]
+  [1m[35m (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_2[0m
+Started GET "/api/v1/utilities/2" for 127.0.0.1 at 2022-12-05 13:03:49 +0100
+Processing by Api::V1::UtilitiesController#show as JSON
+  Parameters: {"id"=>"2", "utility"=>{}}
+  [1m[36mUtility Load (0.1ms)[0m  [1m[34mSELECT "utilities".* FROM "utilities" WHERE "utilities"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  [1m[36mImage Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2 LIMIT $3[0m  [["imagable_id", 2], ["imagable_type", "Utility"], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "trivia"."id" FROM "trivia" WHERE "trivia"."triviable_id" = $1 AND "trivia"."triviable_type" = $2[0m  [["triviable_id", 2], ["triviable_type", "Utility"]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "images"."id" FROM "images" WHERE "images"."imagable_id" = $1 AND "images"."imagable_type" = $2[0m  [["imagable_id", 2], ["imagable_type", "Utility"]]
+  [1m[36mGpsLocation Load (0.1ms)[0m  [1m[34mSELECT "gps_locations".* FROM "gps_locations" WHERE "gps_locations"."id" = $1 LIMIT $2[0m  [["id", 4], ["LIMIT", 1]]
+Completed 200 OK in 4ms (Views: 0.2ms | ActiveRecord: 0.7ms | Allocations: 2976)
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  [1m[31mROLLBACK[0m

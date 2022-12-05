@@ -1,19 +1,20 @@
 default: &default
   adapter:  postgresql
-  database: <%= ENV['DATABASE_DATABASE'] %>
+  database: <%= ENV['DATABASE'] %>
   encoding: utf8
   host:     <%= ENV['DB_HOST'] || ENV['DATABASE_HOST'] %>
-  password: <%= ENV['DB_MYSQL_PASSWORD'] || ENV['DATABASE_PASSWORD'] %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>
   pool: <%= ENV['DATABASE_POOL'] || 5 %>
   port: <%= ENV['DB_PORT'] || ENV['DATABASE_PORT'] %>
   template: template0
-  username: <%= ENV['DB_MYSQL_USER'] || ENV['DATABASE_USERNAME'] %>
+  username: <%= ENV['DATABASE_USERNAME'] %>
 
 development:
   <<: *default
+  database: <%= ENV['DEVELOPMENT_DATABASE'] %>
 test:
   <<: *default
-  database: <%= ENV['DATABASE_DATABASE'] %>
+  database: <%= ENV['TEST_DATABASE'] %>
 production:
   <<: *default
 # DO NOT CHANGE THIS FILE, EDIT CONFIGURATIONS AT application.yml

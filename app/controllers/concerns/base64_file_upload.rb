@@ -26,9 +26,7 @@ module Base64FileUpload
     contents = file_params[:data].sub %r(data:((image|application)/.{3,}),), ''
 
     decoded_data = Base64.decode64(contents)
-    File.open("#{Rails.root}/tmp/#{filename}", 'wb') do |f|
-      f.write(decoded_data)
-    end
+    File.binwrite("#{Rails.root}/tmp/#{filename}", decoded_data)
     filename
   end
 end

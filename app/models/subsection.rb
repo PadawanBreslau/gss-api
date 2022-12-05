@@ -13,10 +13,6 @@ class Subsection < ApplicationRecord
 
   default_scope { order section_id: :asc, section_order: :asc }
 
-  Section.pluck(:id).each do |section_id|
-    scope "section_#{section_id}".to_sym, -> { where(section: section_id) }
-  end
-
   scope :main, -> { joins(:section).where('sections.variation = 0') }
   scope :alternatives, -> { joins(:section).where.not('sections.variation = 0') }
 

@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.7.2'
+ruby '3.1.2'
 
 gem 'bcrypt', '~> 3.1.7'
 gem 'bootsnap', '>= 1.4.2', require: false
@@ -13,6 +13,7 @@ gem 'jsonapi-serializer'
 gem 'kaminari'
 gem 'pg', '0.20.0'
 gem 'puma', '~> 4.1'
+gem 'psych', '< 4'
 gem 'pundit'
 gem 'rack-cors', '~> 1.0'
 gem 'rails', '~> 6.0.3', '>= 6.0.3.4'

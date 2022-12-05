@@ -11,8 +11,6 @@ AllCops:
     - 'config/**/*'
     - 'vendor/**/*'
     - 'node_modules/**/*'
-Rails:
-  Enabled: true
 Documentation:
   Enabled: false
 Style/MixinUsage:
@@ -100,6 +98,7 @@ Lint/UnreachableLoop:
 
 Metrics/BlockLength:
   Exclude:
+    - 'app/admin/*'
     - 'spec/**/*_spec.rb'
     - 'spec/factories/*'
     - 'config/routes.rb'
