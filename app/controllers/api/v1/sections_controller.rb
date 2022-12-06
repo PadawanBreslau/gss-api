@@ -2,7 +2,7 @@ module Api
   module V1
     class SectionsController < Api::V1::BaseController
       def index
-        sections = Section.includes(:images)
+        sections = Section.main.includes(:images)
         render json: SectionSerializer.new(sections).serializable_hash
       end
 
