@@ -4,7 +4,7 @@ module JsonApiHeaders
   extend ActiveSupport::Concern
 
   included do
-    before_action :set_headers, :check_headers
+    #before_action :set_headers, :check_headers
   end
 
   protected
